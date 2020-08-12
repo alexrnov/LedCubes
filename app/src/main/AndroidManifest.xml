@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="alexrnov.ledcubes">
+
+    <!-- Tell the system this application requires OpenGL ES 2.0.
+    version OpenGL 2.0 is available starting with Android 2.2 (API Level 8), OpenGL 3.0 with Android 4.3 (API Level 18).
+    By declaring the OpenGL ES 2.0 API as a requirement in your manifest, you can use that API version as a default,
+    check for the availability of the 3.x API at run time and then use OpenGL ES 3.x features if the device supports it.-->
+    <uses-feature android:glEsVersion="0x00020000" android:required="true"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
