@@ -1,10 +1,9 @@
-package alexrnov.ledcubes.objects;
+package alexrnov.ledcubes;
 
 import android.opengl.GLES30;
+import android.opengl.Matrix;
 
 import java.nio.FloatBuffer;
-
-import alexrnov.ledcubes.LinkedProgram;
 
 import static alexrnov.ledcubes.Buffers.newFloatBuffer;
 
@@ -15,11 +14,17 @@ public class Cube {
 
   private final int programObject;
 
-  private Position position;
+  private float x;
+
+  private float y;
+
+  private float z;
 
   private float[] color;
 
+  private float[] mvpMatrix = new float[16];
 
+  private float[] rotationMatrix = new float[16];
 
   //инициируемый размер куба
   private float size = 1.0f;
@@ -117,7 +122,6 @@ public class Cube {
                     "fragColor = vColor;       \n" +
                     "}     \n";
 
-    //загрузка шейдеров из каталога assets/shaders/
     LinkedProgram linkedProgramGL = new LinkedProgram(
             codeVertexShader, codeFragmentShader);
 
@@ -132,31 +136,27 @@ public class Cube {
             "uMVPMatrix");
   }
 
-  public void defineSettingsForBehavior(int widthScreen, int heightScreen) {
-    position.defineSettingsOfView(widthScreen, heightScreen);
-  }
+  public void defineView(float[] viewMatrix, float[] projectionMatrix) {
+    //сбросить матрицу на единичную
+    Matrix.setIdentityM(rotationMatrix, 0);
+    //переместить куб вверх/вниз и влево/вправо
+    Matrix.translateM(rotationMatrix, 0, x, y, z);
+    //комбинировать видовую и модельные матрицы
+    Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, rotationMatrix, 0);
+    //комбинировать модельно-видовую матрицу и проектирующую матрицу
+    Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0);
 
-  public void move(float[] viewMatrix) {
-    position.run2(viewMatrix);
-  }
-
-  public void setBehavior(Position position) {
-    this.position = position;
   }
 
   public void setColor(float[] color) {
     this.color = color;
   }
 
-  public void setViewMatix() {
-
-  }
-
   public void draw() {
     GLES30.glUseProgram(this.programObject);//использовать объект-программу
     //итоговая MVP-матрица загружается в соответствующую uniform-переменную
     //вершинного шейдера: uniform mat4 uMVPMatrix
-    GLES30.glUniformMatrix4fv(mvpMatrixLink, 1, false, position.getMVP(), 0);
+    GLES30.glUniformMatrix4fv(mvpMatrixLink, 1, false, mvpMatrix, 0);
     //ErrorGL.checkGlError("glUniformMatrix4fv");
 
     int VERTEX_POS_INDEX = 0;
@@ -180,19 +180,17 @@ public class Cube {
     GLES30.glDrawArrays(GLES30.GL_TRIANGLES, startPos, 36);
   }
 
-
-
-
-
-
-
-
-
   public void setSize(float scale) {
     for (int i = 0; i < verticesTemplate.length; i++) {
       verticesWithScale[i] = verticesTemplate[i] * scale;
     }
     vertices = newFloatBuffer(verticesWithScale);
     vertices.position(0);
+  }
+
+  public void setPosition(float x, float y, float z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
   }
 }

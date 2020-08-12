@@ -11,9 +11,6 @@ import java.util.Random;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import alexrnov.ledcubes.objects.Position;
-import alexrnov.ledcubes.objects.Cube;
-
 public class SceneRenderer implements GLSurfaceView.Renderer {
 
   private double versionGL;
@@ -36,6 +33,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   private Random r = new Random();
 
   private float[] viewMatrix = new float[16];
+  private float[] projectionMatrix = new float[16];
 
   public SceneRenderer(double versionGL) {
     this.versionGL = versionGL;
@@ -64,8 +62,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
           int color = r.nextInt(7);
 
-          cubes[i].setBehavior(new Position(x, y, z));
-
+          cubes[i].setPosition(x, y, z);
           if (color == 0) {
             cubes[i].setColor(blue);
           } else if (color == 1) {
@@ -92,9 +89,20 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   public void onSurfaceChanged(GL10 gl, int width, int height) {
     GLES20.glViewport(0, 0, width, height); // set screen size
 
-    for (int i = 0; i < NUMBER_CUBES; i++) {
-      cubes[i].defineSettingsForBehavior(width, height);
+
+    float aspect = (float) width / (float) height;
+
+    Log.i("P", "aspect renderer = " + aspect);
+    float k = 1f / 30; //коэффициент подобран эмпирически
+    if (width < height) {
+      Matrix.frustumM(projectionMatrix, 0, -1f * k, 1f * k,
+              (1/-aspect) * k, (1/aspect) * k, 0.2f, 40f);
+    } else {
+      Matrix.frustumM(projectionMatrix, 0, -aspect * k,
+              aspect * k, -1f * k, 1f * k, 0.2f, 40f);
     }
+
+
   }
 
   // called when the frame is redrawn
@@ -127,7 +135,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     GLES20.glEnable(GLES20.GL_DEPTH_TEST); // enable depth test
 
     for (int i = 0; i < NUMBER_CUBES; i++) {
-      cubes[i].move(viewMatrix);
+      cubes[i].defineView(viewMatrix, projectionMatrix);
       cubes[i].draw();
     }
   }
