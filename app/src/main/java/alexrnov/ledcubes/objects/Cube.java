@@ -136,8 +136,8 @@ public class Cube {
     position.defineSettingsOfView(widthScreen, heightScreen);
   }
 
-  public void move() {
-    position.run2();
+  public void move(float[] viewMatrix) {
+    position.run2(viewMatrix);
   }
 
   public void setBehavior(Position position) {
@@ -146,6 +146,10 @@ public class Cube {
 
   public void setColor(float[] color) {
     this.color = color;
+  }
+
+  public void setViewMatix() {
+
   }
 
   public void draw() {

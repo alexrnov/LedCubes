@@ -2,6 +2,7 @@ package alexrnov.ledcubes;
 
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
 import android.util.Log;
 
 
@@ -17,36 +18,47 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
   private double versionGL;
 
+  private float xoffset = 0.0f;
+  private float zoffset = -3.0f;
   private final float[] blue = BasicColor.blue();
   private final float[] red = BasicColor.red();
   private final float[] yellow = BasicColor.yellow();
   private final float[] cyan = BasicColor.cyan();
   private final float[] green = BasicColor.green();
 
+  private float angle = 0f;
+
   private final int NUMBER_CUBES = 512;
   private Cube[] cubes = new Cube[NUMBER_CUBES];
 
   private Random r = new Random();
+
+  private float[] viewMatrix = new float[16];
+
   public SceneRenderer(double versionGL) {
     this.versionGL = versionGL;
   }
 
   @Override
   public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+
+    Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, -3f,
+            0f, 0f, 0f, 0f, 1.0f, 0.0f);
+
     GLES20.glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
     // implementation prioritizes performance
     GLES20.glHint(GLES20.GL_GENERATE_MIPMAP_HINT, GLES20.GL_FASTEST);
 
     int i = 0;
 
-    for (int kz = 0; kz < 8; kz++) {
-      float z = kz * 0.20f;
+    for (int kz = -4; kz < 4; kz++) {
+      float z = - kz * 0.10f;
       for (int ky = -4; ky < 4; ky++) {
         float y = ky * 0.10f;
-        for (int kx = -2; kx < 6; kx++) {
+        for (int kx = -4; kx < 4; kx++) {
           float x = kx * 0.10f;
 
-          cubes[i] = new Cube(0.007f);
+          cubes[i] = new Cube(0.024f);
 
           int color = r.nextInt(5);
 
@@ -63,37 +75,10 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
           } else {
             cubes[i].setColor(green);
           }
-
-
-
-
-
-
           i++;
         }
       }
     }
-
-
-    /*
-    for (int i = 0; i < NUMBER_CUBES; i++) {
-      cubes[i] = new Cube(0.005f);
-
-
-      Random r = new Random();
-      float xCube = r.nextFloat() * 0.4f;//смещение по оси абцисс
-      float yCube = r.nextFloat() * 0.4f;//смещение по оси ординат
-      float zCube = r.nextFloat() * 10f;
-
-      cubes[i].setBehavior(new Position(xCube, yCube, zCube));
-      if (i % 2 == 0) {
-        cubes[i].setColor(blue);
-      } else {
-        cubes[i].setColor(red);
-      }
-    }
-    */
-
   }
 
   // screen orientation change handler, also called when returning to the app.
@@ -109,6 +94,26 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   // called when the frame is redrawn
   @Override
   public void onDrawFrame(GL10 gl) {
+
+    xoffset = xoffset - 0.01f;
+    Log.i("P", "xoffset = " + xoffset);
+
+    angle = angle + 0.1f;
+    if (angle >=360f) {
+      angle = 0.0f;
+    }
+    float radius = 5.0f;
+
+    float x = (float)( radius * Math.cos(angle));
+    float y = (float)( radius * Math.sin(angle));
+
+    Log.i("P", "x = " + x);
+    Log.i("P", "y = " + y);
+
+    Matrix.setLookAtM(viewMatrix, 0, x, 0, y, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+
+    //Matrix.translateM(viewMatrix, 0, -x, 0, 0);
+
     // set color buffer
     GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
     //GLES20.glEnable(GLES20.GL_CULL_FACE); // allow discard
@@ -116,7 +121,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     GLES20.glEnable(GLES20.GL_DEPTH_TEST); // enable depth test
 
     for (int i = 0; i < NUMBER_CUBES; i++) {
-      cubes[i].move();
+      cubes[i].move(viewMatrix);
       cubes[i].draw();
     }
   }

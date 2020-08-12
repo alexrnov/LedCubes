@@ -41,13 +41,13 @@ class Position(val x: Float, val y: Float, val z: Float) {
     }
   }
 
-  fun run2() { //Создать вращение и перемещение куба
+  fun run2(viewMatrix2: FloatArray) { //Создать вращение и перемещение куба
     //сбросить матрицу на единичную
     Matrix.setIdentityM(rotationMatrix, 0)
     //переместить куб вверх/вниз и влево/вправо
     Matrix.translateM(rotationMatrix, 0, x, y, z)
     //комбинировать видовую и модельные матрицы
-    Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, rotationMatrix, 0)
+    Matrix.multiplyMM(mvpMatrix, 0, viewMatrix2, 0, rotationMatrix, 0)
     //комбинировать модельно-видовую матрицу и проектирующую матрицу
     Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0)
   }
