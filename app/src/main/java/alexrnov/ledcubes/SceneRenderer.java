@@ -25,6 +25,8 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   private final float[] yellow = BasicColor.yellow();
   private final float[] cyan = BasicColor.cyan();
   private final float[] green = BasicColor.green();
+  private final float[] magenta = BasicColor.magenta();
+  private final float[] gray = BasicColor.gray();
 
   private float angle = 0f;
 
@@ -45,7 +47,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, -3f,
             0f, 0f, 0f, 0f, 1.0f, 0.0f);
 
-    GLES20.glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
+    GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     // implementation prioritizes performance
     GLES20.glHint(GLES20.GL_GENERATE_MIPMAP_HINT, GLES20.GL_FASTEST);
 
@@ -60,7 +62,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
           cubes[i] = new Cube(0.024f);
 
-          int color = r.nextInt(5);
+          int color = r.nextInt(7);
 
           cubes[i].setBehavior(new Position(x, y, z));
 
@@ -72,6 +74,10 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
             cubes[i].setColor(yellow);
           } else if (color == 3) {
             cubes[i].setColor(cyan);
+          } else if (color == 4) {
+            cubes[i].setColor(magenta);
+          } else if (color == 5) {
+            cubes[i].setColor(gray);
           } else {
             cubes[i].setColor(green);
           }
@@ -98,7 +104,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     xoffset = xoffset - 0.01f;
     Log.i("P", "xoffset = " + xoffset);
 
-    angle = angle + 0.1f;
+    angle = angle + 0.01f;
     if (angle >=360f) {
       angle = 0.0f;
     }

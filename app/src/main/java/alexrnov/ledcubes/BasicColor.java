@@ -72,4 +72,14 @@ public class BasicColor {
             1.0f
     };
   }
+
+  public static float[] white() {
+    return new float[]{
+            Color.red(Color.WHITE) / 255f,
+            Color.green(Color.WHITE) / 255f,
+            Color.blue(Color.WHITE) / 255f,
+            1.0f
+    };
+
+  }
 }
