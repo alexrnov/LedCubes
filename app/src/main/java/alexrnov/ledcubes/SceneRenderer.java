@@ -55,7 +55,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
       float z = - kz * 0.10f;
       for (int ky = -4; ky < 4; ky++) {
         float y = ky * 0.10f;
-        for (int kx = -4; kx < 4; kx++) {
+        for (int kx = 4; kx > -4; kx--) {
           float x = kx * 0.10f;
 
           cubes[i] = new Cube(0.024f);
@@ -89,20 +89,16 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   public void onSurfaceChanged(GL10 gl, int width, int height) {
     GLES20.glViewport(0, 0, width, height); // set screen size
 
-
     float aspect = (float) width / (float) height;
 
-    Log.i("P", "aspect renderer = " + aspect);
-    float k = 1f / 30; //коэффициент подобран эмпирически
+    float k = 1f / 30; // коэффициент подобран эмпирически
     if (width < height) {
       Matrix.frustumM(projectionMatrix, 0, -1f * k, 1f * k,
-              (1/-aspect) * k, (1/aspect) * k, 0.2f, 40f);
+              (1/-aspect) * k, (1/aspect) * k, 0.1f, 40f);
     } else {
       Matrix.frustumM(projectionMatrix, 0, -aspect * k,
-              aspect * k, -1f * k, 1f * k, 0.2f, 40f);
+              aspect * k, -1f * k, 1f * k, 0.1f, 40f);
     }
-
-
   }
 
   // called when the frame is redrawn
@@ -116,7 +112,8 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     if (angle >=360f) {
       angle = 0.0f;
     }
-    float radius = 5.0f;
+
+    float radius = 2.6f;
 
     float x = (float)( radius * Math.cos(angle));
     float y = (float)( radius * Math.sin(angle));

@@ -9,26 +9,21 @@ import java.nio.FloatBuffer;
 import static alexrnov.ledcubes.Buffers.newFloatBuffer;
 
 public class Cube {
-  private final int mvpMatrixLink; // link of uniform for mvpMatrix
-  private final int colorLink; // link of uniform for color
-  private final int positionLink;
-
   private final int programObject;
 
-  private float x;
-  private float y;
-  private float z;
-
-  private float[] color;
+  private final int mvpMatrixLink; // link of uniform for mvpMatrix
+  private final int colorLink; // link of uniform for color
+  private final int positionLink; // link of vertex attribute
+  private final float size = 1.0f; // init size of cube
 
   private float[] mvpMatrix = new float[16];
   private float[] modelMatrix = new float[16];
 
-  //инициируемый размер куба
-  private float size = 1.0f;
+  private float x, y, z;
+  private float[] color;
 
   //данные вершин для граней куба
-  private float[] verticesTemplate = new float[] {
+  private float[] vertices = new float[] {
           // FRONT
           // Triangle 1
           -size, size, size, // top-left
@@ -90,15 +85,12 @@ public class Cube {
           -size, -size, -size // top-left
   };
 
-  private float[] verticesWithScale = new float[108 * 2];
-
-
-  private FloatBuffer vertices;
-
+  private FloatBuffer bufferVertices;
 
   public Cube(float scale) {
-
-    setSize(scale);
+    for (int i = 0; i < vertices.length; i++) vertices[i] = vertices[i] * scale;
+    bufferVertices = newFloatBuffer(vertices);
+    bufferVertices.position(0);
 
     String vShader =
             "#version 300 es                                      \n" +
@@ -120,8 +112,7 @@ public class Cube {
             "}                                                               \n";
 
     LinkedProgram linkedProgram = new LinkedProgram(vShader, fShader);
-
-    this.programObject = linkedProgram.get();
+    programObject = linkedProgram.get();
 
     mvpMatrixLink = GLES30.glGetUniformLocation(this.programObject, "mvp_matrix");
     colorLink = GLES30.glGetUniformLocation(this.programObject, "v_color");
@@ -144,24 +135,14 @@ public class Cube {
   }
 
   public void draw() {
-    GLES30.glUseProgram(this.programObject);//использовать объект-программу
-    //итоговая MVP-матрица загружается в соответствующую uniform-переменную
-    //вершинного шейдера: uniform mat4 uMVPMatrix
+    GLES30.glUseProgram(this.programObject);
     GLES30.glUniformMatrix4fv(mvpMatrixLink, 1, false, mvpMatrix, 0);
+    GLES30.glUniform4fv(colorLink, 1, color, 0);
 
-    GLES30.glVertexAttribPointer(positionLink, 3, GLES30.GL_FLOAT, false, 0, vertices);
+    GLES30.glVertexAttribPointer(positionLink, 3, GLES30.GL_FLOAT, false, 0, bufferVertices);
     GLES30.glEnableVertexAttribArray(positionLink);//разрешить атрибут вершин
 
-    GLES30.glUniform4fv(colorLink, 1, color, 0);
     GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, 36);
-  }
-
-  public void setSize(float scale) {
-    for (int i = 0; i < verticesTemplate.length; i++) {
-      verticesWithScale[i] = verticesTemplate[i] * scale;
-    }
-    vertices = newFloatBuffer(verticesWithScale);
-    vertices.position(0);
   }
 
   public void setPosition(float x, float y, float z) {
