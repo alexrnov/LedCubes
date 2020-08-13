@@ -5,7 +5,6 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.Log;
 
-
 import java.util.Random;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -55,7 +54,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
       float z = - kz * 0.10f;
       for (int ky = -4; ky < 4; ky++) {
         float y = ky * 0.10f;
-        for (int kx = 4; kx > -4; kx--) {
+        for (int kx = 4; kx > -4; kx--) { // start position of lowest right angle
           float x = kx * 0.10f;
 
           cubes[i] = new Cube(0.024f);
@@ -63,6 +62,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
           int color = r.nextInt(7);
 
           cubes[i].setPosition(x, y, z);
+
           if (color == 0) {
             cubes[i].setColor(blue);
           } else if (color == 1) {
