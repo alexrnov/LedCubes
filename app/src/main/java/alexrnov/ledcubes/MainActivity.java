@@ -15,6 +15,6 @@ public class MainActivity extends AppCompatActivity {
 
     customSurfaceView = findViewById(R.id.oglView);
 
-    customSurfaceView.init(3);
+    customSurfaceView.init(3, getApplicationContext());
   }
 }

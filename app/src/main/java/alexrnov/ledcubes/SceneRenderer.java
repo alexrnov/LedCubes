@@ -14,8 +14,6 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
   private double versionGL;
 
-  private float xoffset = 0.0f;
-  private float zoffset = -3.0f;
   private final float[] blue = BasicColor.blue();
   private final float[] red = BasicColor.red();
   private final float[] yellow = BasicColor.yellow();
@@ -24,11 +22,12 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   private final float[] magenta = BasicColor.magenta();
   private final float[] gray = BasicColor.gray();
 
-  private float angle = 0f;
+  private float k = 0f;
 
   private final int NUMBER_CUBES = 512;
   private Cube[] cubes = new Cube[NUMBER_CUBES];
 
+  Cube demoCube;
   private Random r = new Random();
 
   private float[] viewMatrix = new float[16];
@@ -41,12 +40,17 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   @Override
   public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 
-    Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, -3f,
+    Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, 3f,
             0f, 0f, 0f, 0f, 1.0f, 0.0f);
 
     GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     // implementation prioritizes performance
     GLES20.glHint(GLES20.GL_GENERATE_MIPMAP_HINT, GLES20.GL_FASTEST);
+
+    demoCube = new Cube(0.24f);
+    demoCube.setPosition(0f,0f,0f);
+    demoCube.setColor(blue);
+
 
     int i = 0;
 
@@ -82,6 +86,8 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
         }
       }
     }
+
+
   }
 
   // screen orientation change handler, also called when returning to the app.
@@ -105,25 +111,26 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   @Override
   public void onDrawFrame(GL10 gl) {
 
-    xoffset = xoffset - 0.01f;
-    Log.i("P", "xoffset = " + xoffset);
+    //angle = (angle >=360f) ? 0.0f : angle + 0.01f;
 
-    angle = angle + 0.01f;
-    if (angle >=360f) {
-      angle = 0.0f;
-    }
+    //k += 0.01f;
 
+
+    k = (k >= Math.PI * 2) ? 0.0f : k + 0.01f;
     float radius = 2.6f;
 
-    float x = (float)( radius * Math.cos(angle));
-    float y = (float)( radius * Math.sin(angle));
+    float x = (float) (radius * Math.cos(k));
+    float y = (float) (radius * Math.cos(k));
+    float z = (float) (radius * Math.sin(k));
 
-    Log.i("P", "x = " + x);
-    Log.i("P", "y = " + y);
+    Log.i("P", "angle = " + k);
 
-    Matrix.setLookAtM(viewMatrix, 0, x, 0, y, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+    Matrix.rotateM(viewMatrix, 0, 1.0f, 1, 0, 0);
+    Matrix.rotateM(viewMatrix, 0, 1.0f, 0, 1, 0);
+    //Matrix.rotateM(viewMatrix, 0, 1.0f, 0, 0, 1);
+    //Matrix.setLookAtM(viewMatrix, 0, x, y, z, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
 
-    //Matrix.translateM(viewMatrix, 0, -x, 0, 0);
+    //Matrix.translateM(viewMatrix, 0, -x, 0, -z);
 
     // set color buffer
     GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
@@ -131,9 +138,15 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     //GLES20.glCullFace(GLES20.GL_BACK); // discard the back face of primitives
     GLES20.glEnable(GLES20.GL_DEPTH_TEST); // enable depth test
 
+
     for (int i = 0; i < NUMBER_CUBES; i++) {
       cubes[i].defineView(viewMatrix, projectionMatrix);
       cubes[i].draw();
     }
+
+
+
+    //demoCube.defineView(viewMatrix, projectionMatrix);
+    //demoCube.draw();
   }
 }
