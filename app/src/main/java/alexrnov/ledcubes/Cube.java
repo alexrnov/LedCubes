@@ -1,5 +1,6 @@
 package alexrnov.ledcubes;
 
+import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.opengl.Matrix;
 
@@ -8,23 +9,20 @@ import java.nio.FloatBuffer;
 import static alexrnov.ledcubes.Buffers.newFloatBuffer;
 
 public class Cube {
-  //ссылка на переменную вершинного шейдера, содержащую итоговую
-  //MVP-матрицу uniform mat4 uMVPMatrix;
-  private final int mvpMatrixLink;
+  private final int mvpMatrixLink; // link of uniform for mvpMatrix
+  private final int colorLink; // link of uniform for color
+  private final int positionLink;
 
   private final int programObject;
 
   private float x;
-
   private float y;
-
   private float z;
 
   private float[] color;
 
   private float[] mvpMatrix = new float[16];
-
-  private float[] rotationMatrix = new float[16];
+  private float[] modelMatrix = new float[16];
 
   //инициируемый размер куба
   private float size = 1.0f;
@@ -93,59 +91,52 @@ public class Cube {
   };
 
   private float[] verticesWithScale = new float[108 * 2];
-  private float scale;
 
-  FloatBuffer vertices;
+
+  private FloatBuffer vertices;
 
 
   public Cube(float scale) {
-    this.scale = scale;
+
     setSize(scale);
 
+    String vShader =
+            "#version 300 es                                      \n" +
+            "uniform mat4 mvp_matrix;                      \n" +
+            "in vec4 a_position;                                   \n" +
+            "void main()                                               \n" +
+            "{                                                              \n" +
+              "gl_Position = mvp_matrix * a_position;  \n" +
+            "}                                                              \n";
 
-    String codeVertexShader =
-            "#version 300 es   \n" +
-                    "uniform mat4 uMVPMatrix;    \n" +
-                    "layout(location = 0) in vec4 vPosition;    \n" +
-                    "void main()    \n" +
-                    "{   \n" +
-                    "gl_Position = uMVPMatrix * vPosition;    \n" +
-                    "}   \n";
+    String fShader =
+            "#version 300 es                                      \n" +
+            "precision mediump float;                          \n" +
+            "uniform vec4 v_color;                              \n" +
+            "out vec4 fragColor;                                  \n" +
+            "void main()                                               \n" +
+            "{                                                              \n" +
+              "fragColor = v_color;                               \n" +
+            "}                                                               \n";
 
-    String codeFragmentShader =
-            "#version 300 es       \n" +
-                    "precision mediump float;       \n" +
-                    "uniform vec4 vColor;      \n" +
-                    "out vec4 fragColor;       \n" +
-                    "void main()       \n" +
-                    "{       \n" +
-                    "fragColor = vColor;       \n" +
-                    "}     \n";
+    LinkedProgram linkedProgram = new LinkedProgram(vShader, fShader);
 
-    LinkedProgram linkedProgramGL = new LinkedProgram(
-            codeVertexShader, codeFragmentShader);
+    this.programObject = linkedProgram.get();
 
-    this.programObject = linkedProgramGL.get();
-
-    //связать vPosition с атрибутом 0 в шейдере
-    GLES30.glBindAttribLocation(this.programObject, 0, "vPosition");
-
-    //Получить ссылку на переменную, содержащую итоговую MPV-матрицу.
-    //Эта переменная находится в вершинном шейдере: uniform mat4 uMVPMatrix;
-    mvpMatrixLink = GLES30.glGetUniformLocation(this.programObject,
-            "uMVPMatrix");
+    mvpMatrixLink = GLES30.glGetUniformLocation(this.programObject, "mvp_matrix");
+    colorLink = GLES30.glGetUniformLocation(this.programObject, "v_color");
+    positionLink = GLES20.glGetAttribLocation(programObject, "a_position");
   }
 
   public void defineView(float[] viewMatrix, float[] projectionMatrix) {
     //сбросить матрицу на единичную
-    Matrix.setIdentityM(rotationMatrix, 0);
+    Matrix.setIdentityM(modelMatrix, 0);
     //переместить куб вверх/вниз и влево/вправо
-    Matrix.translateM(rotationMatrix, 0, x, y, z);
+    Matrix.translateM(modelMatrix, 0, x, y, z);
     //комбинировать видовую и модельные матрицы
-    Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, rotationMatrix, 0);
+    Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelMatrix, 0);
     //комбинировать модельно-видовую матрицу и проектирующую матрицу
     Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0);
-
   }
 
   public void setColor(float[] color) {
@@ -157,27 +148,12 @@ public class Cube {
     //итоговая MVP-матрица загружается в соответствующую uniform-переменную
     //вершинного шейдера: uniform mat4 uMVPMatrix
     GLES30.glUniformMatrix4fv(mvpMatrixLink, 1, false, mvpMatrix, 0);
-    //ErrorGL.checkGlError("glUniformMatrix4fv");
 
-    int VERTEX_POS_INDEX = 0;
-    //Загрузить данные вершин, которые затем могут быть корректно
-    //трансформирваны. Это нужно было бы сделать, даже если бы не было ни
-    //какой трансформации.
-    GLES30.glVertexAttribPointer(VERTEX_POS_INDEX, 3, GLES30.GL_FLOAT,
-            false, 0, vertices);
-    GLES30.glEnableVertexAttribArray(VERTEX_POS_INDEX);//разрешить атрибут вершин
-    //Now we are ready to draw the cube finally.
-    int startPos = 0;
-    //изменить цвет через шесть вершин, т.е. через два треугольника, которые
-    //представляют одну грань куба
-    int verticesPerface = 6;
-    //получить ссылку на переменную vColor во фрагментном шейдере
-    int mColorHandle = GLES30.glGetUniformLocation(this.programObject, "vColor");
-    //нарисовать переднюю грань
-    //массив текущего цвета для грани помещается в соответствующую
-    //переменную фрагментого шейдера: uniform vec4 vColor
-    GLES30.glUniform4fv(mColorHandle, 1, color, 0);
-    GLES30.glDrawArrays(GLES30.GL_TRIANGLES, startPos, 36);
+    GLES30.glVertexAttribPointer(positionLink, 3, GLES30.GL_FLOAT, false, 0, vertices);
+    GLES30.glEnableVertexAttribArray(positionLink);//разрешить атрибут вершин
+
+    GLES30.glUniform4fv(colorLink, 1, color, 0);
+    GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, 36);
   }
 
   public void setSize(float scale) {
