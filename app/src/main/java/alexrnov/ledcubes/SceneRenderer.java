@@ -27,7 +27,6 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   private final int NUMBER_CUBES = 512;
   private Cube[] cubes = new Cube[NUMBER_CUBES];
 
-  Cube demoCube;
   private Random r = new Random();
 
   private float[] viewMatrix = new float[16];
@@ -47,13 +46,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     // implementation prioritizes performance
     GLES20.glHint(GLES20.GL_GENERATE_MIPMAP_HINT, GLES20.GL_FASTEST);
 
-    demoCube = new Cube(0.24f);
-    demoCube.setPosition(0f,0f,0f);
-    demoCube.setColor(blue);
-
-
     int i = 0;
-
     for (int kz = -4; kz < 4; kz++) {
       float z = - kz * 0.10f;
       for (int ky = -4; ky < 4; ky++) {
@@ -111,27 +104,6 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   @Override
   public void onDrawFrame(GL10 gl) {
 
-    //angle = (angle >=360f) ? 0.0f : angle + 0.01f;
-
-    //k += 0.01f;
-
-
-    k = (k >= Math.PI * 2) ? 0.0f : k + 0.01f;
-    float radius = 2.6f;
-
-    float x = (float) (radius * Math.cos(k));
-    float y = (float) (radius * Math.cos(k));
-    float z = (float) (radius * Math.sin(k));
-
-    Log.i("P", "angle = " + k);
-
-    Matrix.rotateM(viewMatrix, 0, 1.0f, 1, 0, 0);
-    Matrix.rotateM(viewMatrix, 0, 1.0f, 0, 1, 0);
-    //Matrix.rotateM(viewMatrix, 0, 1.0f, 0, 0, 1);
-    //Matrix.setLookAtM(viewMatrix, 0, x, y, z, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
-
-    //Matrix.translateM(viewMatrix, 0, -x, 0, -z);
-
     // set color buffer
     GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
     //GLES20.glEnable(GLES20.GL_CULL_FACE); // allow discard
@@ -143,10 +115,27 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
       cubes[i].defineView(viewMatrix, projectionMatrix);
       cubes[i].draw();
     }
+  }
+
+  public synchronized void defaultView() {
+    Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, 3f,
+            0f, 0f, 0f, 0f, 1.0f, 0.0f);
+
+  }
+
+  public void setTranslate(float xTranslate, float yTranslate) {
+    Log.i("P", "lengthX = " + xTranslate);
+    Log.i("P", "lengthY = " + yTranslate);
+
+    xTranslate = xTranslate * 0.01f;
 
 
+    yTranslate = yTranslate * 0.01f;
 
-    //demoCube.defineView(viewMatrix, projectionMatrix);
-    //demoCube.draw();
+    Log.i("P", "lengthX2 = " + xTranslate);
+    Log.i("P", "lengthY2 = " + yTranslate);
+    Matrix.rotateM(viewMatrix, 0, -xTranslate, 0, 1, 0);
+    Matrix.rotateM(viewMatrix, 0, -yTranslate, 1, 0, 0);
+
   }
 }

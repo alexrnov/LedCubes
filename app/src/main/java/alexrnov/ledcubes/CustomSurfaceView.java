@@ -13,9 +13,12 @@ import androidx.core.view.GestureDetectorCompat;
 public class CustomSurfaceView extends GLSurfaceView implements GestureDetector.OnGestureListener,
         GestureDetector.OnDoubleTapListener {
 
-  GLSurfaceView.Renderer renderer;
+  SceneRenderer renderer;
 
   private GestureDetectorCompat mDetector;
+
+  private volatile float xTranslate = 0.0f;
+  private volatile float yTranslate = 0.0f;
 
   public CustomSurfaceView(Context context) {
     super(context);
@@ -39,21 +42,6 @@ public class CustomSurfaceView extends GLSurfaceView implements GestureDetector.
     //установить детектор жестов как слушатель двойного нажатия
     mDetector.setOnDoubleTapListener(this);
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   @SuppressLint("ClickableViewAccessibility")
   @Override
@@ -88,6 +76,7 @@ public class CustomSurfaceView extends GLSurfaceView implements GestureDetector.
   {
 
     Log.i("P", "double tap");
+    renderer.defaultView();
     return true;
   }
 
@@ -106,9 +95,12 @@ public class CustomSurfaceView extends GLSurfaceView implements GestureDetector.
                           float distanceX, float distanceY) {
     Log.v("P", "onScroll: " + event1.getX() + ", " + event1.getY()
            + "//" + event2.getX() + ", " + event2.getY());
-
+    xTranslate = event1.getX() - event2.getX();
+    yTranslate = event1.getY() - event2.getY();
+    //Log.i("P", "lengthX = " + xTranslate);
+    //Log.i("P", "lengthY = " + yTranslate);
+    renderer.setTranslate(xTranslate, yTranslate);
     return true;
-
   }
 
   @Override
