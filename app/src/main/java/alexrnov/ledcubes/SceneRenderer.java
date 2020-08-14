@@ -137,37 +137,15 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   }
 
   public synchronized void setMotion(float xDistance, float yDistance) {
-    Log.i("P", "xDistance = " + xDistance + ", yDistance = " + yDistance);
-
-    /*
-    if (Math.abs(xDistance) > Math.abs(yDistance)) {
-      Matrix.rotateM(viewMatrix, 0, -xDistance * 0.1f, 0, 1, 0);
-
-    } else {
-      Matrix.rotateM(viewMatrix, 0, -yDistance * 0.1f, 1, 0, 0);
+    kx = kx + xDistance * 0.001f;
+    if ((!(ky < -0.5) || !(yDistance < 0.0)) && (!(ky > 0.5) || !(yDistance >= 0.0))) {
+      ky = ky + yDistance * 0.001f;
     }
 
-
-     */
-
-    /*
-    cumulativeX += xDistance;
-    cumulativeY += yDistance;
-
-    Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, 3f,
-            0f, 0f, 0f, 0f, 1.0f, 0.0f);
-    Matrix.rotateM(viewMatrix, 0, -cumulativeX * 0.1f, 0, 1, 0);
-    Matrix.rotateM(viewMatrix, 0, -cumulativeY * 0.1f, 1, 0, 0);
-    */
-
-    kx = kx + xDistance * 0.001f;
     x = (float) (radius * Math.sin(kx));
     z = (float) (radius * Math.cos(kx));
-
-    ky = ky + yDistance * 0.001f;
     y = (float) (radius * Math.sin(ky));
 
     Matrix.setLookAtM(viewMatrix, 0, x, -y, z, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
-
   }
 }
