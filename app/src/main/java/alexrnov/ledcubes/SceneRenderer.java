@@ -24,12 +24,11 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
   private float k = 0f;
 
-  private float x1 = 0f;
-  private float y1 = 0f;
+  private float kx = 0f;
+  private float ky = 0f;
+  private float radius = 3.0f;
 
-  private float x = 0f;
-  private float y = 0f;
-  private float z = 0f;
+  private float x, y, z = 0f;
 
   private final int NUMBER_CUBES = 512;
   private Cube[] cubes = new Cube[NUMBER_CUBES];
@@ -38,6 +37,10 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
   private float[] viewMatrix = new float[16];
   private float[] projectionMatrix = new float[16];
+
+  private float cumulativeX = 0.0f;
+  private float cumulativeY = 0.0f;
+
 
   public SceneRenderer(double versionGL) {
     this.versionGL = versionGL;
@@ -48,6 +51,9 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
     Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, 3f,
             0.0f, 0f, 0f, 0f, 1.0f, 0.0f);
+
+    cumulativeX = 0.0f;
+    cumulativeY = 0.0f;
 
     GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     // implementation prioritizes performance
@@ -140,31 +146,28 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     } else {
       Matrix.rotateM(viewMatrix, 0, -yDistance * 0.1f, 1, 0, 0);
     }
+
+
+     */
+
+    /*
+    cumulativeX += xDistance;
+    cumulativeY += yDistance;
+
+    Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, 3f,
+            0f, 0f, 0f, 0f, 1.0f, 0.0f);
+    Matrix.rotateM(viewMatrix, 0, -cumulativeX * 0.1f, 0, 1, 0);
+    Matrix.rotateM(viewMatrix, 0, -cumulativeY * 0.1f, 1, 0, 0);
     */
 
-    if (Math.abs(xDistance) > Math.abs(yDistance)) {
+    kx = kx + xDistance * 0.001f;
+    x = (float) (radius * Math.sin(kx));
+    z = (float) (radius * Math.cos(kx));
 
-      x1 = x1 + xDistance * 0.001f;
-      x = (float) (3.0 * Math.sin(x1));
-      z = (float) (3.0 * Math.cos(x1));
-      Matrix.setLookAtM(viewMatrix, 0, x, y, z, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+    ky = ky + yDistance * 0.001f;
+    y = (float) (radius * Math.sin(ky));
 
-    } else {
-      /*
-      y1 = y1 + xDistance * 0.01f;
-      y = (float) (3.0 * Math.sin(y1));
-      z = (float) (3.0 * Math.cos(y1));
-      Matrix.setLookAtM(viewMatrix, 0, x, y, z, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
-    */
-    }
+    Matrix.setLookAtM(viewMatrix, 0, x, -y, z, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
 
-
-
-
-
-
-
-    //Matrix.rotateM(viewMatrix, 0, -xDistance * 0.1f, 0, 1, 0);
-    //Matrix.rotateM(viewMatrix, 0, -yDistance * 0.1f, 1, 0, 0);
   }
 }
