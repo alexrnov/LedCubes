@@ -123,19 +123,8 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
   }
 
-  public void setTranslate(float xTranslate, float yTranslate) {
-    Log.i("P", "lengthX = " + xTranslate);
-    Log.i("P", "lengthY = " + yTranslate);
-
-    xTranslate = xTranslate * 0.01f;
-
-
-    yTranslate = yTranslate * 0.01f;
-
-    Log.i("P", "lengthX2 = " + xTranslate);
-    Log.i("P", "lengthY2 = " + yTranslate);
-    Matrix.rotateM(viewMatrix, 0, -xTranslate, 0, 1, 0);
-    Matrix.rotateM(viewMatrix, 0, -yTranslate, 1, 0, 0);
-
+  public synchronized void setMotion(float xDistance, float yDistance) {
+    Matrix.rotateM(viewMatrix, 0, -xDistance * 0.1f, 0, 1, 0);
+    Matrix.rotateM(viewMatrix, 0, -yDistance * 0.1f, 1, 0, 0);
   }
 }

@@ -10,21 +10,21 @@ import android.view.MotionEvent;
 
 import androidx.core.view.GestureDetectorCompat;
 
-public class CustomSurfaceView extends GLSurfaceView implements GestureDetector.OnGestureListener,
+public class SurfaceView extends GLSurfaceView implements GestureDetector.OnGestureListener,
         GestureDetector.OnDoubleTapListener {
 
   SceneRenderer renderer;
 
   private GestureDetectorCompat mDetector;
 
-  private volatile float xTranslate = 0.0f;
-  private volatile float yTranslate = 0.0f;
+  private volatile float xMotion = 0.0f;
+  private volatile float yMotion = 0.0f;
 
-  public CustomSurfaceView(Context context) {
+  public SurfaceView(Context context) {
     super(context);
   }
 
-  public CustomSurfaceView(Context context, AttributeSet attributes) {
+  public SurfaceView(Context context, AttributeSet attributes) {
     super(context, attributes);
   }
 
@@ -93,13 +93,7 @@ public class CustomSurfaceView extends GLSurfaceView implements GestureDetector.
   @Override
   public boolean onScroll(MotionEvent event1, MotionEvent event2,
                           float distanceX, float distanceY) {
-    Log.v("P", "onScroll: " + event1.getX() + ", " + event1.getY()
-           + "//" + event2.getX() + ", " + event2.getY());
-    xTranslate = event1.getX() - event2.getX();
-    yTranslate = event1.getY() - event2.getY();
-    //Log.i("P", "lengthX = " + xTranslate);
-    //Log.i("P", "lengthY = " + yTranslate);
-    renderer.setTranslate(xTranslate, yTranslate);
+    renderer.setMotion(distanceX, distanceY);
     return true;
   }
 

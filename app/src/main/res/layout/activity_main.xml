@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <alexrnov.ledcubes.CustomSurfaceView
+    <alexrnov.ledcubes.SurfaceView
         android:id="@+id/oglView"
         android:layout_width="0dp"
         android:layout_height="0dp"
