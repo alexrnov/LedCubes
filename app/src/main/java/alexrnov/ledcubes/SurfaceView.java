@@ -36,6 +36,7 @@ public class SurfaceView extends GLSurfaceView implements GestureDetector.OnGest
     renderer = new SceneRenderer(versionGLES);
     setRenderer(renderer);
     //setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+    //setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 
 
     mDetector = new GestureDetectorCompat(context, this);

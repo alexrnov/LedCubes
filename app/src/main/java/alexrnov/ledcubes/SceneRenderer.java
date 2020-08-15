@@ -22,15 +22,12 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   private final float[] magenta = BasicColor.magenta();
   private final float[] gray = BasicColor.gray();
 
-  private float k = 0f;
-
   private float kx = 0f;
   private float ky = 0f;
-  private float radius = 3.0f;
 
-  private float x = 0.0f;
-  private float y = 0.0f;
-  private float z = 3.0f;
+  private float xCamera = 0.0f;
+  private float yCamera = 0.0f;
+  private float zCamera = 2.6f;
 
   private final int NUMBER_CUBES = 512;
   private Cube[] cubes = new Cube[NUMBER_CUBES];
@@ -40,10 +37,6 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   private float[] viewMatrix = new float[16];
   private float[] projectionMatrix = new float[16];
 
-  private float cumulativeX = 0.0f;
-  private float cumulativeY = 0.0f;
-
-
   public SceneRenderer(double versionGL) {
     this.versionGL = versionGL;
   }
@@ -51,9 +44,8 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   @Override
   public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 
-    Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, 3f,
-            0.0f, 0f, 0f, 0f, 1.0f, 0.0f);
-
+    Matrix.setLookAtM(viewMatrix, 0, xCamera, yCamera, zCamera,
+            0.0f, 0.0f, 0f, 0f, 1.0f, 0.0f);
 
     GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     // implementation prioritizes performance
@@ -90,8 +82,6 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
         }
       }
     }
-
-
   }
 
   // screen orientation change handler, also called when returning to the app.
@@ -127,35 +117,42 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
     for (int i = 0; i < NUMBER_CUBES; i++) {
       // invoke every frame to avoid flickering when rotating
-      //cubes[i].defineView(viewMatrix, projectionMatrix);
+      cubes[i].defineView(viewMatrix, projectionMatrix);
       cubes[i].draw();
     }
   }
 
   public synchronized void defaultView() {
-    Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, 3f,
+    xCamera = 0f;
+    yCamera = 0f;
+    zCamera = 2.6f;
+    kx = 0f;
+    ky = 0f;
+    Matrix.setLookAtM(viewMatrix, 0, xCamera, yCamera, zCamera,
             0f, 0f, 0f, 0f, 1.0f, 0.0f);
-
   }
 
   public synchronized void setMotion(float xDistance, float yDistance) {
     kx = kx + xDistance * 0.001f;
-
     // limit rotation to z
     if ((!(ky < -0.5) || !(yDistance < 0.0)) && (!(ky > 0.5) || !(yDistance >= 0.0))) {
       ky = ky + yDistance * 0.001f;
     }
 
+    final float radius = 2.6f;
     // define coordinates for camera
-    float x = (float) (radius * Math.cos(ky) * Math.sin(kx));
-    float y = (float) (radius * Math.sin(ky));
-    float z = (float) (radius * Math.cos(ky) * Math.cos(kx));
+    xCamera = (float) (radius * Math.cos(ky) * Math.sin(kx));
+    yCamera = (float) (radius * Math.sin(ky));
+    zCamera = (float) (radius * Math.cos(ky) * Math.cos(kx));
 
-    Matrix.setLookAtM(viewMatrix, 0, x, -y, z, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+    Matrix.setLookAtM(viewMatrix, 0, xCamera, -yCamera, zCamera,
+            0f, 0.0f, 0f, 0f, 1.0f, 0.0f);
+    /*
     for (int i = 0; i < NUMBER_CUBES; i++) {
       // invoke every frame to avoid flickering when rotating
       cubes[i].defineView(viewMatrix, projectionMatrix);
-      //cubes[i].draw();
+      cubes[i].draw();
     }
+    */
   }
 }
