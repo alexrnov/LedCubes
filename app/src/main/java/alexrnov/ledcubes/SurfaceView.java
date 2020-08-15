@@ -111,7 +111,9 @@ public class SurfaceView extends GLSurfaceView implements GestureDetector.OnGest
   }
 
 
-
+  public SceneRenderer getSceneRenderer() {
+    return renderer;
+  }
 
 
 

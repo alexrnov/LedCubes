@@ -3,7 +3,9 @@ package alexrnov.ledcubes
 import android.app.ActivityManager
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
   private var surfaceView: SurfaceView? = null
@@ -28,6 +30,8 @@ class MainActivity : AppCompatActivity() {
       }
     }
 
+  private var timer: Timer? = null
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
@@ -36,5 +40,18 @@ class MainActivity : AppCompatActivity() {
       surfaceView = findViewById(R.id.oglView)
       surfaceView?.init(supportOpenGLES, applicationContext)
     }
+  }
+
+  override fun onResume() {
+    super.onResume()
+    var i = 0
+    timer = Timer(true)
+    timer?.schedule(object : TimerTask() {
+      override fun run() {
+        Log.i("P", "timer = 30")
+        surfaceView?.sceneRenderer?.setColor(i, BasicColor.cyan())
+        i++
+      }
+    }, 5000, 100)
   }
 }

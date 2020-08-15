@@ -38,6 +38,9 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   private float[] viewMatrix = new float[16];
   private float[] projectionMatrix = new float[16];
 
+  private long pastTime = System.currentTimeMillis();
+  private long spentTime = System.currentTimeMillis();
+
   public SceneRenderer(int versionGL) {
     this.versionGL = versionGL;
   }
@@ -63,7 +66,8 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
           cubes[i] = new Cube(0.024f, versionGL);
           int color = r.nextInt(7);
           cubes[i].setPosition(x, y, z);
-
+          cubes[i].setColor(gray);
+          /*
           if (color == 0) {
             cubes[i].setColor(blue);
           } else if (color == 1) {
@@ -79,6 +83,8 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
           } else {
             cubes[i].setColor(green);
           }
+
+           */
           i++;
         }
       }
@@ -105,6 +111,10 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   // called when the frame is redrawn
   @Override
   public void onDrawFrame(GL10 gl) {
+
+    spentTime = System.currentTimeMillis() - pastTime;
+    pastTime = System.currentTimeMillis();
+    Log.v("P", "spentTime = " + spentTime);
     // set color buffer
     GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
     //GLES20.glEnable(GLES20.GL_CULL_FACE); // allow discard
@@ -112,12 +122,15 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     GLES20.glEnable(GLES20.GL_DEPTH_TEST); // enable depth test
 
     // apply immutable matrix to avoid flicker artifact
+
     final float[] immutableViewMatrix = Arrays.copyOf(viewMatrix, 16);
     for (int i = 0; i < NUMBER_CUBES; i++) {
       // invoke every frame to avoid flickering when rotating
       cubes[i].defineView(immutableViewMatrix, projectionMatrix);
       cubes[i].draw();
     }
+
+
   }
 
   /** Set camera in default place */
@@ -146,5 +159,9 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
     Matrix.setLookAtM(viewMatrix, 0, xCamera, -yCamera, zCamera,
             0f, 0.0f, 0f, 0f, 1.0f, 0.0f);
+  }
+
+  public void setColor(int i, float[] color) {
+    cubes[i].setColor(color);
   }
 }
