@@ -5,6 +5,7 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.Log;
 
+import java.util.Arrays;
 import java.util.Random;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -53,11 +54,11 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
     int i = 0;
     for (int kz = -4; kz < 4; kz++) {
-      float z = - kz * 0.10f;
+      float z = - kz * 0.10f - 0.04f;
       for (int ky = -4; ky < 4; ky++) {
-        float y = ky * 0.10f;
+        float y = ky * 0.10f - 0.04f;
         for (int kx = 4; kx > -4; kx--) { // start position of lowest right angle
-          float x = kx * 0.10f;
+          float x = kx * 0.10f - 0.04f;
 
           cubes[i] = new Cube(0.024f);
           int color = r.nextInt(7);
@@ -99,29 +100,27 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
       Matrix.frustumM(projectionMatrix, 0, -aspect * k,
               aspect * k, -1f * k, 1f * k, 0.1f, 40f);
     }
-
-    for (int i = 0; i < NUMBER_CUBES; i++) {
-      cubes[i].defineView(viewMatrix, projectionMatrix);
-    }
   }
 
   // called when the frame is redrawn
   @Override
   public void onDrawFrame(GL10 gl) {
-
     // set color buffer
     GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
     //GLES20.glEnable(GLES20.GL_CULL_FACE); // allow discard
     //GLES20.glCullFace(GLES20.GL_BACK); // discard the back face of primitives
     GLES20.glEnable(GLES20.GL_DEPTH_TEST); // enable depth test
 
+    // apply immutable matrix to avoid flicker artifact
+    final float[] immutableViewMatrix = Arrays.copyOf(viewMatrix, 16);
     for (int i = 0; i < NUMBER_CUBES; i++) {
       // invoke every frame to avoid flickering when rotating
-      cubes[i].defineView(viewMatrix, projectionMatrix);
+      cubes[i].defineView(immutableViewMatrix, projectionMatrix);
       cubes[i].draw();
     }
   }
 
+  /** Set camera in default place */
   public synchronized void defaultView() {
     xCamera = 0f;
     yCamera = 0f;
@@ -147,12 +146,5 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
     Matrix.setLookAtM(viewMatrix, 0, xCamera, -yCamera, zCamera,
             0f, 0.0f, 0f, 0f, 1.0f, 0.0f);
-    /*
-    for (int i = 0; i < NUMBER_CUBES; i++) {
-      // invoke every frame to avoid flickering when rotating
-      cubes[i].defineView(viewMatrix, projectionMatrix);
-      cubes[i].draw();
-    }
-    */
   }
 }
