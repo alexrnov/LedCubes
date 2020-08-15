@@ -28,7 +28,9 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   private float ky = 0f;
   private float radius = 3.0f;
 
-  private float x, y, z = 0f;
+  private float x = 0.0f;
+  private float y = 0.0f;
+  private float z = 3.0f;
 
   private final int NUMBER_CUBES = 512;
   private Cube[] cubes = new Cube[NUMBER_CUBES];
@@ -52,8 +54,6 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, 3f,
             0.0f, 0f, 0f, 0f, 1.0f, 0.0f);
 
-    cumulativeX = 0.0f;
-    cumulativeY = 0.0f;
 
     GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     // implementation prioritizes performance
@@ -68,9 +68,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
           float x = kx * 0.10f;
 
           cubes[i] = new Cube(0.024f);
-
           int color = r.nextInt(7);
-
           cubes[i].setPosition(x, y, z);
 
           if (color == 0) {
@@ -111,6 +109,10 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
       Matrix.frustumM(projectionMatrix, 0, -aspect * k,
               aspect * k, -1f * k, 1f * k, 0.1f, 40f);
     }
+
+    for (int i = 0; i < NUMBER_CUBES; i++) {
+      cubes[i].defineView(viewMatrix, projectionMatrix);
+    }
   }
 
   // called when the frame is redrawn
@@ -123,9 +125,9 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     //GLES20.glCullFace(GLES20.GL_BACK); // discard the back face of primitives
     GLES20.glEnable(GLES20.GL_DEPTH_TEST); // enable depth test
 
-
     for (int i = 0; i < NUMBER_CUBES; i++) {
-      cubes[i].defineView(viewMatrix, projectionMatrix);
+      // invoke every frame to avoid flickering when rotating
+      //cubes[i].defineView(viewMatrix, projectionMatrix);
       cubes[i].draw();
     }
   }
@@ -138,14 +140,22 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
   public synchronized void setMotion(float xDistance, float yDistance) {
     kx = kx + xDistance * 0.001f;
+
+    // limit rotation to z
     if ((!(ky < -0.5) || !(yDistance < 0.0)) && (!(ky > 0.5) || !(yDistance >= 0.0))) {
       ky = ky + yDistance * 0.001f;
     }
 
-    x = (float) (radius * Math.sin(kx));
-    z = (float) (radius * Math.cos(kx));
-    y = (float) (radius * Math.sin(ky));
+    // define coordinates for camera
+    float x = (float) (radius * Math.cos(ky) * Math.sin(kx));
+    float y = (float) (radius * Math.sin(ky));
+    float z = (float) (radius * Math.cos(ky) * Math.cos(kx));
 
     Matrix.setLookAtM(viewMatrix, 0, x, -y, z, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+    for (int i = 0; i < NUMBER_CUBES; i++) {
+      // invoke every frame to avoid flickering when rotating
+      cubes[i].defineView(viewMatrix, projectionMatrix);
+      //cubes[i].draw();
+    }
   }
 }
