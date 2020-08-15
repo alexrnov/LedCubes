@@ -2,6 +2,7 @@ package alexrnov.ledcubes;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -21,7 +22,7 @@ public class Cube {
 
   private FloatBuffer bufferVertices;
 
-  public Cube(float size) {
+  public Cube(float size, int versionGL) {
 
     float[] vertices = new float[] {
             -size, size, size, -size, -size, size, size, -size, size, size, -size, size,
@@ -38,24 +39,47 @@ public class Cube {
             .order(ByteOrder.nativeOrder()).asFloatBuffer();
     bufferVertices.put(vertices).position(0);
 
-    String vShader =
-            "#version 300 es                                      \n" +
-            "uniform mat4 mvp_matrix;                      \n" +
-            "in vec4 a_position;                                   \n" +
-            "void main()                                               \n" +
-            "{                                                              \n" +
-              "gl_Position = mvp_matrix * a_position;  \n" +
-            "}                                                              \n";
+    String vShader, fShader;
+    if (versionGL == 2) {
+      vShader =
+              "#version 100                                            \n" +
+              "uniform mat4 mvp_matrix;                       \n" +
+              "attribute vec4 a_position;                        \n" +
+              "void main()                                               \n" +
+              "{                                                              \n" +
+                "gl_Position = mvp_matrix * a_position;  \n" +
+              "}                                                              \n";
 
-    String fShader =
-            "#version 300 es                                      \n" +
-            "precision mediump float;                          \n" +
-            "uniform vec4 v_color;                              \n" +
-            "out vec4 fragColor;                                  \n" +
-            "void main()                                               \n" +
-            "{                                                              \n" +
-              "fragColor = v_color;                               \n" +
-            "}                                                               \n";
+      fShader =
+              "#version 100                                           \n" +
+              "precision lowp float;                                 \n" +
+              "uniform vec4 v_color;                              \n" +
+              "void main()                                              \n" +
+              "{                                                              \n" +
+                "gl_FragColor = v_color;                         \n" +
+              "}                                                              \n";
+
+    } else { // version opengl es 3.0 or higher
+      vShader =
+              "#version 300 es                                      \n" +
+              "uniform mat4 mvp_matrix;                      \n" +
+              "in vec4 a_position;                                   \n" +
+              "void main()                                               \n" +
+              "{                                                              \n" +
+                "gl_Position = mvp_matrix * a_position;  \n" +
+              "}                                                              \n";
+
+      fShader =
+              "#version 300 es                                      \n" +
+              "precision lowp float;                                \n" +
+              "uniform vec4 v_color;                              \n" +
+              "out vec4 fragColor;                                  \n" +
+              "void main()                                               \n" +
+              "{                                                              \n" +
+                "fragColor = v_color;                               \n" +
+              "}                                                               \n";
+    }
+
 
     LinkedProgram linkedProgram = new LinkedProgram(vShader, fShader);
     programObject = linkedProgram.get();

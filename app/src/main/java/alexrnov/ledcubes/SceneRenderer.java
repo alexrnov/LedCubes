@@ -13,7 +13,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class SceneRenderer implements GLSurfaceView.Renderer {
 
-  private double versionGL;
+  private int versionGL;
 
   private final float[] blue = BasicColor.blue();
   private final float[] red = BasicColor.red();
@@ -38,7 +38,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   private float[] viewMatrix = new float[16];
   private float[] projectionMatrix = new float[16];
 
-  public SceneRenderer(double versionGL) {
+  public SceneRenderer(int versionGL) {
     this.versionGL = versionGL;
   }
 
@@ -60,7 +60,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
         for (int kx = 4; kx > -4; kx--) { // start position of lowest right angle
           float x = kx * 0.10f - 0.04f;
 
-          cubes[i] = new Cube(0.024f);
+          cubes[i] = new Cube(0.024f, versionGL);
           int color = r.nextInt(7);
           cubes[i].setPosition(x, y, z);
 
