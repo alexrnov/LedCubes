@@ -92,7 +92,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
     float aspect = (float) width / (float) height;
 
-    float k = 1f / 30; // коэффициент подобран эмпирически
+    float k = 1f / 30; // coefficient is selected empirically
     if (width < height) {
       Matrix.frustumM(projectionMatrix, 0, -1f * k, 1f * k,
               (1/-aspect) * k, (1/aspect) * k, 0.1f, 40f);

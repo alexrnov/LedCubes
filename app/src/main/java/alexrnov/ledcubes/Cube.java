@@ -1,7 +1,6 @@
 package alexrnov.ledcubes;
 
 import android.opengl.GLES20;
-import android.opengl.GLES30;
 import android.opengl.Matrix;
 
 import java.nio.ByteBuffer;
@@ -61,8 +60,8 @@ public class Cube {
     LinkedProgram linkedProgram = new LinkedProgram(vShader, fShader);
     programObject = linkedProgram.get();
 
-    mvpMatrixLink = GLES30.glGetUniformLocation(this.programObject, "mvp_matrix");
-    colorLink = GLES30.glGetUniformLocation(this.programObject, "v_color");
+    mvpMatrixLink = GLES20.glGetUniformLocation(this.programObject, "mvp_matrix");
+    colorLink = GLES20.glGetUniformLocation(this.programObject, "v_color");
     positionLink = GLES20.glGetAttribLocation(programObject, "a_position");
   }
 
@@ -81,15 +80,15 @@ public class Cube {
    * must be called first.
    */
   public void draw() {
-    GLES30.glUseProgram(this.programObject);
-    GLES30.glUniformMatrix4fv(mvpMatrixLink, 1, false, mvpMatrix, 0);
-    GLES30.glUniform4fv(colorLink, 1, color, 0); // pass color to shader
+    GLES20.glUseProgram(this.programObject);
+    GLES20.glUniformMatrix4fv(mvpMatrixLink, 1, false, mvpMatrix, 0);
+    GLES20.glUniform4fv(colorLink, 1, color, 0); // pass color to shader
 
-    GLES30.glEnableVertexAttribArray(positionLink);// allow cube vertices attribute
-    GLES30.glVertexAttribPointer(positionLink, 3, GLES30.GL_FLOAT, false, 0, bufferVertices);
+    GLES20.glEnableVertexAttribArray(positionLink);// allow cube vertices attribute
+    GLES20.glVertexAttribPointer(positionLink, 3, GLES20.GL_FLOAT, false, 0, bufferVertices);
 
-    GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, 36);
-    GLES30.glDisableVertexAttribArray(positionLink); // disable cube vertices attribute
+    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 36);
+    GLES20.glDisableVertexAttribArray(positionLink); // disable cube vertices attribute
   }
 
   /**
