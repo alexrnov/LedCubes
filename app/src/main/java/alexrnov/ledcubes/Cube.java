@@ -7,6 +7,7 @@ import android.util.Log;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.Arrays;
 
 public class Cube {
   private final int programObject;
@@ -111,7 +112,40 @@ public class Cube {
     GLES20.glEnableVertexAttribArray(positionLink);// allow cube vertices attribute
     GLES20.glVertexAttribPointer(positionLink, 3, GLES20.GL_FLOAT, false, 0, bufferVertices);
 
-    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 36);
+    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
+
+    float[] color2 = Arrays.copyOf(color, 4);
+
+    color2[0] = color[0] * 0.5f; // back - back
+    color2[1] = color[1] * 0.5f;
+    color2[2] = color[2] * 0.5f;
+    GLES20.glUniform4fv(colorLink, 1, color2, 0); // pass color to shader
+    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 6, 6);
+
+    color2[0] = color[0] * 0.7f; // back-side
+    color2[1] = color[1] * 0.7f;
+    color2[2] = color[2] * 0.7f;
+    GLES20.glUniform4fv(colorLink, 1, color2, 0); // pass color to shader
+    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 12, 6);
+
+    color2[0] = color[0] * 0.8f; // front-side
+    color2[1] = color[1] * 0.8f;
+    color2[2] = color[2] * 0.8f;
+    GLES20.glUniform4fv(colorLink, 1, color2, 0); // pass color to shader
+    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 18, 6);
+
+    color2[0] = color[0] * 0.9f; // top
+    color2[1] = color[1] * 0.9f;
+    color2[2] = color[2] * 0.9f;
+    GLES20.glUniform4fv(colorLink, 1, color2, 0); // pass color to shader
+    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 24, 6);
+
+    color2[0] = color[0] * 0.6f; // down
+    color2[1] = color[1] * 0.6f;
+    color2[2] = color[2] * 0.6f;
+    GLES20.glUniform4fv(colorLink, 1, color2, 0); // pass color to shader
+    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 30, 6);
+
     GLES20.glDisableVertexAttribArray(positionLink); // disable cube vertices attribute
   }
 
