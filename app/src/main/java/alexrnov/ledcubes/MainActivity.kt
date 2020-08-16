@@ -3,7 +3,6 @@ package alexrnov.ledcubes
 import android.app.ActivityManager
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 
@@ -45,22 +44,32 @@ class MainActivity : AppCompatActivity() {
   override fun onResume() {
     super.onResume()
     var i = 0
-    var k = 1
-    var color = BasicColor.cyan()
+
     timer = Timer(true)
     timer?.schedule(object : TimerTask() {
       override fun run() {
+        val color = when (Random().nextInt(8)) {
+          0 -> BasicColor.cyan()
+          1 -> BasicColor.red()
+          2 -> BasicColor.blue()
+          3 -> BasicColor.green()
+          4 -> BasicColor.blue()
+          5 -> BasicColor.yellow()
+          6 -> BasicColor.white()
+          else -> BasicColor.magenta()
+        }
         surfaceView?.sceneRenderer?.setColor(i, color)
-        i += k
-        if (i == 511) {
-          k = -1
-          color = BasicColor.gray()
-        }
-        if (i == 0) {
-          k = 1
-          color = BasicColor.cyan()
-        }
+        i += 1
+        if (i == 512) this.cancel()
       }
-    }, 5000, 10)
+    }, 0, 30)
+
+    surfaceView?.onResume()
+  }
+
+  override fun onPause() {
+    super.onPause()
+    timer?.cancel()
+    surfaceView?.onPause()
   }
 }

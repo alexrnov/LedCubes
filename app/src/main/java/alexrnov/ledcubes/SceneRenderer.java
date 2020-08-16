@@ -162,6 +162,8 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   }
 
   public void setColor(int i, float[] color) {
-    cubes[i].setColor(color);
+    if (cubes[i] != null) {
+      cubes[i].setColor(color);
+    }
   }
 }
