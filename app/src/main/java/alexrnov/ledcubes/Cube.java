@@ -118,9 +118,33 @@ public class Cube {
     GLES20.glUniformMatrix4fv(mvpMatrixLink, 1, false, mvpMatrix, 0);
     GLES20.glEnableVertexAttribArray(positionLink);// allow cube vertices attribute
     GLES20.glVertexAttribPointer(positionLink, 3, GLES20.GL_FLOAT, false, 0, bufferVertices);
+
+    /* different pseudo-shades for front faces */
     // front face
     GLES20.glUniform4fv(colorLink, 1, color[0], 0); // pass color of face to shader
     GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6); // draw current face
+    // front-side face
+    GLES20.glUniform4fv(colorLink, 1, color[3], 0);
+    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 18, 6);
+    // top face
+    GLES20.glUniform4fv(colorLink, 1, color[4], 0);
+    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 24, 6);
+
+    // one color for back faces
+    GLES20.glUniform4fv(colorLink, 1, color[2], 0);
+    // back face
+    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 6, 6);
+    // back-side face
+    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 12, 6);
+    // down face
+    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 30, 6);
+
+    /* different pseudo-shades for each face */
+    /*
+    // front face
+    GLES20.glUniform4fv(colorLink, 1, color[0], 0); // pass color of face to shader
+    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6); // draw current face
+
     // back face
     GLES20.glUniform4fv(colorLink, 1, color[1], 0);
     GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 6, 6);
@@ -136,7 +160,7 @@ public class Cube {
     // down face
     GLES20.glUniform4fv(colorLink, 1, color[5], 0);
     GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 30, 6);
-
+    */
     GLES20.glDisableVertexAttribArray(positionLink); // disable cube vertices attribute
   }
 
