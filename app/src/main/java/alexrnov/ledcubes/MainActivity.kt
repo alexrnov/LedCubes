@@ -48,21 +48,21 @@ class MainActivity : AppCompatActivity() {
     timer = Timer(true)
     timer?.schedule(object : TimerTask() {
       override fun run() {
-        if (surfaceView?.sceneRenderer?.isLoad()!!) {
-        val color = when (Random().nextInt(8)) {
-          0 -> BasicColor.cyan()
-          1 -> BasicColor.red()
-          2 -> BasicColor.blue()
-          3 -> BasicColor.green()
-          4 -> BasicColor.blue()
-          5 -> BasicColor.yellow()
-          6 -> BasicColor.white()
-          else -> BasicColor.magenta()
+        if (surfaceView?.sceneRenderer?.isLoad!!) {
+          val color = when (Random().nextInt(8)) {
+            0 -> BasicColor.cyan()
+            1 -> BasicColor.red()
+            2 -> BasicColor.blue()
+            3 -> BasicColor.green()
+            4 -> BasicColor.blue()
+            5 -> BasicColor.yellow()
+            6 -> BasicColor.white()
+            else -> BasicColor.magenta()
+          }
+          surfaceView?.sceneRenderer?.setColor(i, color)
+          i += 1
+          if (i == 512) this.cancel()
         }
-        surfaceView?.sceneRenderer?.setColor(i, color)
-        i += 1
-        if (i == 512) this.cancel()
-      }
       }
     }, 0, 30)
 
