@@ -6,7 +6,6 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 import java.util.Arrays;
-import java.util.Random;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -14,14 +13,6 @@ import javax.microedition.khronos.opengles.GL10;
 public class SceneRenderer implements GLSurfaceView.Renderer {
 
   private int versionGL;
-
-  private final float[] blue = BasicColor.blue();
-  private final float[] red = BasicColor.red();
-  private final float[] yellow = BasicColor.yellow();
-  private final float[] cyan = BasicColor.cyan();
-  private final float[] green = BasicColor.green();
-  private final float[] magenta = BasicColor.magenta();
-  private final float[] gray = BasicColor.gray();
 
   private float kx = 0f;
   private float ky = 0f;
@@ -33,13 +24,13 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   private final int NUMBER_CUBES = 512;
   private Cube[] cubes = new Cube[NUMBER_CUBES];
 
-  private Random r = new Random();
-
   private float[] viewMatrix = new float[16];
   private float[] projectionMatrix = new float[16];
 
   private long pastTime = System.currentTimeMillis();
   private long spentTime = System.currentTimeMillis();
+
+  private boolean initCubes = false;
 
   public SceneRenderer(int versionGL) {
     this.versionGL = versionGL;
@@ -47,7 +38,6 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
   @Override
   public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-
     Matrix.setLookAtM(viewMatrix, 0, xCamera, yCamera, zCamera,
             0.0f, 0.0f, 0f, 0f, 1.0f, 0.0f);
 
@@ -62,36 +52,17 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
         float y = ky * 0.10f - 0.04f;
         for (int kx = 4; kx > -4; kx--) { // start position of lowest right angle
           float x = kx * 0.10f - 0.04f;
-
           cubes[i] = new Cube(0.024f, versionGL);
-          int color = r.nextInt(7);
           cubes[i].setPosition(x, y, z);
-          cubes[i].setColor(gray);
-          /*
-          if (color == 0) {
-            cubes[i].setColor(blue);
-          } else if (color == 1) {
-            cubes[i].setColor(red);
-          } else if (color == 2) {
-            cubes[i].setColor(yellow);
-          } else if (color == 3) {
-            cubes[i].setColor(cyan);
-          } else if (color == 4) {
-            cubes[i].setColor(magenta);
-          } else if (color == 5) {
-            cubes[i].setColor(gray);
-          } else {
-            cubes[i].setColor(green);
-          }
-
-           */
+          cubes[i].setColor(BasicColor.gray());
           i++;
         }
       }
     }
+    initCubes = true;
   }
 
-  // screen orientation change handler, also called when returning to the app.
+  // screen orientation change handler, also called when returning to the app
   @Override
   public void onSurfaceChanged(GL10 gl, int width, int height) {
     GLES20.glViewport(0, 0, width, height); // set screen size
@@ -122,15 +93,12 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     GLES20.glEnable(GLES20.GL_DEPTH_TEST); // enable depth test
 
     // apply immutable matrix to avoid flicker artifact
-
     final float[] immutableViewMatrix = Arrays.copyOf(viewMatrix, 16);
     for (int i = 0; i < NUMBER_CUBES; i++) {
       // invoke every frame to avoid flickering when rotating
       cubes[i].defineView(immutableViewMatrix, projectionMatrix);
       cubes[i].draw();
     }
-
-
   }
 
   /** Set camera in default place */
@@ -161,9 +129,11 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
             0f, 0.0f, 0f, 0f, 1.0f, 0.0f);
   }
 
-  public void setColor(int i, float[] color) {
-    if (cubes[i] != null) {
-      cubes[i].setColor(color);
-    }
+  public synchronized boolean isLoad() {
+    return initCubes;
+  }
+
+  public synchronized void setColor(int i, float[] color) {
+    cubes[i].setColor(color);
   }
 }
