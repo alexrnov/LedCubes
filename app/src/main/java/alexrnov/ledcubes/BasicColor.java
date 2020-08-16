@@ -82,4 +82,27 @@ public class BasicColor {
     };
 
   }
+
+  public static float[][] shades(float[] color) {
+    float[][] colorWithShades = new float[6][4];
+
+    colorWithShades[0] = new float[] {color[0], color[1], color[2], 1.0f}; // front
+
+    // back - back
+    colorWithShades[1] = new float[] {color[0] * 0.5f, color[1] * 0.5f, color[2] * 0.5f, 1.0f };
+
+    // back-side
+    colorWithShades[2] = new float[] {color[0] * 0.7f, color[1] * 0.7f, color[2] * 0.7f, 1.0f };
+
+    // front-side
+    colorWithShades[3] = new float[] {color[0] * 0.8f, color[1] * 0.8f, color[2] * 0.8f, 1.0f };
+
+    // top
+    colorWithShades[4] = new float[] {color[0] * 0.9f, color[1] * 0.9f, color[2] * 0.9f, 1.0f };
+
+    // down
+    colorWithShades[5] = new float[] {color[0] * 0.6f, color[1] * 0.6f, color[2] * 0.6f, 1.0f};
+
+    return colorWithShades;
+  }
 }

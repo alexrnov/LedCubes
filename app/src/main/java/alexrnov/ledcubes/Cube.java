@@ -2,13 +2,18 @@ package alexrnov.ledcubes;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
-import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.util.Arrays;
 
+/**
+ * A class for creating a separate cube that can change color. No indices or
+ * normals are used for the cube. It also does not use shader lighting
+ * computation and buffer objects. This is due to the goal of improving
+ * performance, since there can be many cubes. Additional data and objects
+ * can increase memory consumption and object initialization time.
+ */
 public class Cube {
   private final int programObject;
 
@@ -19,10 +24,15 @@ public class Cube {
   private float[] mvpMatrix = new float[16];
   private float[] modelMatrix = new float[16];
 
-  private float[] color; // color of cube
+  private float[][] color; // color of cube
 
   private FloatBuffer bufferVertices;
 
+  /**
+   * Create a cube of a specific size
+   * @param size - size of cube
+   * @param versionGL - support version of OpenGL ES
+   */
   public Cube(float size, int versionGL) {
 
     float[] vertices = new float[] {
@@ -41,7 +51,7 @@ public class Cube {
     bufferVertices.put(vertices).position(0);
 
     String vShader, fShader;
-    if (versionGL == 2) {
+    if (versionGL == 2) { // version is OpenGL ES 2.0
       vShader =
               "#version 100                                            \n" +
               "uniform mat4 mvp_matrix;                       \n" +
@@ -60,7 +70,7 @@ public class Cube {
                 "gl_FragColor = v_color;                         \n" +
               "}                                                              \n";
 
-    } else { // version opengl es 3.0 or higher
+    } else { // version OpenGL ES 3.0 or higher
       vShader =
               "#version 300 es                                      \n" +
               "uniform mat4 mvp_matrix;                      \n" +
@@ -81,7 +91,6 @@ public class Cube {
               "}                                                               \n";
     }
 
-
     LinkedProgram linkedProgram = new LinkedProgram(vShader, fShader);
     programObject = linkedProgram.get();
 
@@ -92,8 +101,8 @@ public class Cube {
 
   /**
    * Define view of cube.
-   * @param viewMatrix
-   * @param projectionMatrix
+   * @param viewMatrix - matrix of view (change when changes when the cube rotates)
+   * @param projectionMatrix - projection matrix (change when the screen rotates)
    */
   public void defineView(float[] viewMatrix, float[] projectionMatrix) {
     Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelMatrix, 0);
@@ -107,43 +116,25 @@ public class Cube {
   public void draw() {
     GLES20.glUseProgram(this.programObject);
     GLES20.glUniformMatrix4fv(mvpMatrixLink, 1, false, mvpMatrix, 0);
-    GLES20.glUniform4fv(colorLink, 1, color, 0); // pass color to shader
-
     GLES20.glEnableVertexAttribArray(positionLink);// allow cube vertices attribute
     GLES20.glVertexAttribPointer(positionLink, 3, GLES20.GL_FLOAT, false, 0, bufferVertices);
-
-    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
-
-    float[] color2 = Arrays.copyOf(color, 4);
-
-    color2[0] = color[0] * 0.5f; // back - back
-    color2[1] = color[1] * 0.5f;
-    color2[2] = color[2] * 0.5f;
-    GLES20.glUniform4fv(colorLink, 1, color2, 0); // pass color to shader
+    // front face
+    GLES20.glUniform4fv(colorLink, 1, color[0], 0); // pass color of face to shader
+    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6); // draw current face
+    // back face
+    GLES20.glUniform4fv(colorLink, 1, color[1], 0);
     GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 6, 6);
-
-    color2[0] = color[0] * 0.7f; // back-side
-    color2[1] = color[1] * 0.7f;
-    color2[2] = color[2] * 0.7f;
-    GLES20.glUniform4fv(colorLink, 1, color2, 0); // pass color to shader
+    // back-side face
+    GLES20.glUniform4fv(colorLink, 1, color[2], 0);
     GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 12, 6);
-
-    color2[0] = color[0] * 0.8f; // front-side
-    color2[1] = color[1] * 0.8f;
-    color2[2] = color[2] * 0.8f;
-    GLES20.glUniform4fv(colorLink, 1, color2, 0); // pass color to shader
+    // front-side face
+    GLES20.glUniform4fv(colorLink, 1, color[3], 0);
     GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 18, 6);
-
-    color2[0] = color[0] * 0.9f; // top
-    color2[1] = color[1] * 0.9f;
-    color2[2] = color[2] * 0.9f;
-    GLES20.glUniform4fv(colorLink, 1, color2, 0); // pass color to shader
+    // top face
+    GLES20.glUniform4fv(colorLink, 1, color[4], 0);
     GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 24, 6);
-
-    color2[0] = color[0] * 0.6f; // down
-    color2[1] = color[1] * 0.6f;
-    color2[2] = color[2] * 0.6f;
-    GLES20.glUniform4fv(colorLink, 1, color2, 0); // pass color to shader
+    // down face
+    GLES20.glUniform4fv(colorLink, 1, color[5], 0);
     GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 30, 6);
 
     GLES20.glDisableVertexAttribArray(positionLink); // disable cube vertices attribute
@@ -153,7 +144,7 @@ public class Cube {
    * Set color for cube.
    * @param color - current color
    */
-  public void setColor(float[] color) {
+  public void setColor(float[][] color) {
     this.color = color;
   }
 

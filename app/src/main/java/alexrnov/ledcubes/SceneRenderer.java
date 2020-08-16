@@ -10,13 +10,17 @@ import java.util.Arrays;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import static alexrnov.ledcubes.BasicColor.shades;
+
 public class SceneRenderer implements GLSurfaceView.Renderer {
 
   private int versionGL;
 
+  // coefficients for camera rotation
   private float kx = 0f;
   private float ky = 0f;
 
+  // coordinates of camera
   private float xCamera = 0.0f;
   private float yCamera = 0.0f;
   private float zCamera = 2.6f;
@@ -31,6 +35,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   private long spentTime = System.currentTimeMillis();
 
   private boolean initCubes = false;
+  private float[][] defaultColor = shades(BasicColor.gray());
 
   public SceneRenderer(int versionGL) {
     this.versionGL = versionGL;
@@ -45,16 +50,16 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     // implementation prioritizes performance
     GLES20.glHint(GLES20.GL_GENERATE_MIPMAP_HINT, GLES20.GL_FASTEST);
 
-    int i = 0;
+    int i = 0; // id of cube
     for (int kz = -4; kz < 4; kz++) {
-      float z = - kz * 0.10f - 0.04f;
+      float z = - kz * 0.10f - 0.04f; // subtract the 0.04 value to center the scene
       for (int ky = -4; ky < 4; ky++) {
         float y = ky * 0.10f - 0.04f;
         for (int kx = 4; kx > -4; kx--) { // start position of lowest right angle
           float x = kx * 0.10f - 0.04f;
           cubes[i] = new Cube(0.024f, versionGL);
           cubes[i].setPosition(x, y, z);
-          cubes[i].setColor(BasicColor.gray());
+          cubes[i].setColor(defaultColor);
           i++;
         }
       }
@@ -68,8 +73,8 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     GLES20.glViewport(0, 0, width, height); // set screen size
 
     float aspect = (float) width / (float) height;
-
     float k = 1f / 30; // coefficient is selected empirically
+
     if (width < height) {
       Matrix.frustumM(projectionMatrix, 0, -1f * k, 1f * k,
               (1/-aspect) * k, (1/aspect) * k, 0.1f, 40f);
@@ -82,14 +87,11 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   // called when the frame is redrawn
   @Override
   public void onDrawFrame(GL10 gl) {
-
     spentTime = System.currentTimeMillis() - pastTime;
     pastTime = System.currentTimeMillis();
-    Log.v("P", "spentTime = " + spentTime);
+    Log.v("P", "spentTime (fps) = " + spentTime);
     // set color buffer
     GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-    //GLES20.glEnable(GLES20.GL_CULL_FACE); // allow discard
-    //GLES20.glCullFace(GLES20.GL_BACK); // discard the back face of primitives
     GLES20.glEnable(GLES20.GL_DEPTH_TEST); // enable depth test
 
     // apply immutable matrix to avoid flicker artifact
@@ -112,6 +114,11 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
             0f, 0f, 0f, 0f, 1.0f, 0.0f);
   }
 
+  /**
+   * Move camera based on offset by X and Y
+   * @param xDistance - X-axis offset
+   * @param yDistance - Y-axis offset
+   */
   public synchronized void setMotion(float xDistance, float yDistance) {
     kx = kx + xDistance * 0.001f;
     // limit rotation to z
@@ -119,21 +126,32 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
       ky = ky + yDistance * 0.001f;
     }
 
-    final float radius = 2.6f;
-    // define coordinates for camera
+    final float radius = 2.6f; // radius of rotation of the camera around the object
+    // define spherical coordinates for camera
     xCamera = (float) (radius * Math.cos(ky) * Math.sin(kx));
     yCamera = (float) (radius * Math.sin(ky));
     zCamera = (float) (radius * Math.cos(ky) * Math.cos(kx));
 
+    // set position for camera
     Matrix.setLookAtM(viewMatrix, 0, xCamera, -yCamera, zCamera,
             0f, 0.0f, 0f, 0f, 1.0f, 0.0f);
   }
 
+  /**
+   * The method checks if all cubes are initialized.
+   * @return <value>true</value> - if all cubes is init,
+   * <value>else</value> - in another case
+   */
   public synchronized boolean isLoad() {
     return initCubes;
   }
 
-  public synchronized void setColor(int i, float[] color) {
+  /**
+   * Set current color for cube.
+   * @param i - id of cube
+   * @param color - current color of cube
+   */
+  public synchronized void setColor(int i, float[][] color) {
     cubes[i].setColor(color);
   }
 }

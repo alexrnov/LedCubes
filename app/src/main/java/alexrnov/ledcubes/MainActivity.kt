@@ -1,5 +1,6 @@
 package alexrnov.ledcubes
 
+import alexrnov.ledcubes.BasicColor.shades
 import android.app.ActivityManager
 import android.content.Context
 import android.os.Bundle
@@ -8,6 +9,18 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
   private var surfaceView: SurfaceView? = null
+
+  /*
+   * Colors with shades for different faces. Lighting is not computed
+   * in the shader for performance reasons.
+   */
+  private val cyan: Array<FloatArray> = shades(BasicColor.cyan())
+  private val red = shades(BasicColor.red())
+  private val blue = shades(BasicColor.blue())
+  private val green = shades(BasicColor.green())
+  private val yellow = shades(BasicColor.yellow())
+  private val white = shades(BasicColor.white())
+  private val magenta = shades(BasicColor.magenta())
 
   /*
    * Checking the OpenGL version on the device at runtime. The manifest declares
@@ -30,6 +43,7 @@ class MainActivity : AppCompatActivity() {
     }
 
   private var timer: Timer? = null
+  private var i = 0 // id of current cube
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -41,30 +55,30 @@ class MainActivity : AppCompatActivity() {
     }
   }
 
+  /* Here you can control the cube */
   override fun onResume() {
     super.onResume()
-    var i = 0
 
-    timer = Timer(true)
+    timer = Timer(true) // run thread as demon
     timer?.schedule(object : TimerTask() {
       override fun run() {
+        // check initialization of all cubes
         if (surfaceView?.sceneRenderer?.isLoad!!) {
-          val color = when (Random().nextInt(8)) {
-            0 -> BasicColor.cyan()
-            1 -> BasicColor.red()
-            2 -> BasicColor.blue()
-            3 -> BasicColor.green()
-            4 -> BasicColor.blue()
-            5 -> BasicColor.yellow()
-            6 -> BasicColor.white()
-            else -> BasicColor.magenta()
+          val color:Array<FloatArray> = when (Random().nextInt(7)) {
+            0 -> cyan
+            1 -> red
+            2 -> blue
+            3 -> green
+            4 -> white
+            5 -> yellow
+            else -> magenta
           }
-          surfaceView?.sceneRenderer?.setColor(i, color)
+          surfaceView?.sceneRenderer?.setColor(i, color) // change color the current cube
           i += 1
           if (i == 512) this.cancel()
         }
       }
-    }, 0, 30)
+    }, 0, 30) // change color every 30 ms
 
     surfaceView?.onResume()
   }
