@@ -65,6 +65,8 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
       }
     }
     initCubes = true;
+    // set default camera angle
+    this.setMotion(900.0f, -350.0f);
   }
 
   // screen orientation change handler, also called when returning to the app
@@ -89,7 +91,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   public void onDrawFrame(GL10 gl) {
     spentTime = System.currentTimeMillis() - pastTime;
     pastTime = System.currentTimeMillis();
-    Log.v("P", "spentTime (fps) = " + spentTime);
+    //Log.v("P", "spentTime (fps) = " + spentTime);
     // set color buffer
     GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
     GLES20.glEnable(GLES20.GL_DEPTH_TEST); // enable depth test
@@ -110,8 +112,11 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     zCamera = 2.6f;
     kx = 0f;
     ky = 0f;
+
     Matrix.setLookAtM(viewMatrix, 0, xCamera, yCamera, zCamera,
             0f, 0f, 0f, 0f, 1.0f, 0.0f);
+    // set default camera angle
+    this.setMotion(900.0f, -350.0f);
   }
 
   /**
@@ -120,6 +125,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
    * @param yDistance - Y-axis offset
    */
   public synchronized void setMotion(float xDistance, float yDistance) {
+    Log.i("P", "xDistance = " + xDistance + ", yDistance =" + yDistance);
     kx = kx + xDistance * 0.001f;
     // limit rotation to z
     if ((!(ky < -0.5) || !(yDistance < 0.0)) && (!(ky > 0.5) || !(yDistance >= 0.0))) {
