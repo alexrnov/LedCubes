@@ -45,13 +45,22 @@ class MainActivity : AppCompatActivity() {
   override fun onResume() {
     super.onResume()
     var i = 0
+    var k = 1
+    var color = BasicColor.cyan()
     timer = Timer(true)
     timer?.schedule(object : TimerTask() {
       override fun run() {
-        Log.i("P", "timer = 30")
-        surfaceView?.sceneRenderer?.setColor(i, BasicColor.cyan())
-        i++
+        surfaceView?.sceneRenderer?.setColor(i, color)
+        i += k
+        if (i == 511) {
+          k = -1
+          color = BasicColor.gray()
+        }
+        if (i == 0) {
+          k = 1
+          color = BasicColor.cyan()
+        }
       }
-    }, 5000, 100)
+    }, 5000, 10)
   }
 }
