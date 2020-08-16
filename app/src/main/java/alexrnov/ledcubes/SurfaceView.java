@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
@@ -14,11 +13,7 @@ public class SurfaceView extends GLSurfaceView implements GestureDetector.OnGest
         GestureDetector.OnDoubleTapListener {
 
   SceneRenderer renderer;
-
-  private GestureDetectorCompat mDetector;
-
-  private volatile float xMotion = 0.0f;
-  private volatile float yMotion = 0.0f;
+  private GestureDetectorCompat detector;
 
   public SurfaceView(Context context) {
     super(context);
@@ -35,30 +30,34 @@ public class SurfaceView extends GLSurfaceView implements GestureDetector.OnGest
     setEGLContextClientVersion(versionGLES);
     renderer = new SceneRenderer(versionGLES);
     setRenderer(renderer);
-    //setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-    //setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-
-
-    mDetector = new GestureDetectorCompat(context, this);
-    //установить детектор жестов как слушатель двойного нажатия
-    mDetector.setOnDoubleTapListener(this);
+    detector = new GestureDetectorCompat(context, this);
+    detector.setOnDoubleTapListener(this); // set gesture detector as double tap listener
   }
 
   @SuppressLint("ClickableViewAccessibility")
   @Override
   public boolean onTouchEvent(MotionEvent e) {
-
-    if (mDetector.onTouchEvent(e)) {
+    if (detector.onTouchEvent(e)) {
       return true;
     }
-
     return super.onTouchEvent(e);
   }
 
+  @Override
+  public boolean onScroll(MotionEvent event1, MotionEvent event2,
+                          float distanceX, float distanceY) {
+    renderer.setMotion(distanceX, distanceY); // camera rotation
+    return true;
+  }
+
+  @Override
+  public boolean onDoubleTapEvent(MotionEvent motionEvent) {
+    renderer.defaultView(); // return the camera to default view
+    return true;
+  }
 
   @Override
   public boolean onDown(MotionEvent event) {
-
     return true;
   }
 
@@ -73,28 +72,12 @@ public class SurfaceView extends GLSurfaceView implements GestureDetector.OnGest
   }
 
   @Override
-  public boolean onDoubleTapEvent(MotionEvent motionEvent)
-  {
-
-    Log.i("P", "double tap");
-    renderer.defaultView();
-    return true;
-  }
-
-  @Override
   public void onShowPress(MotionEvent motionEvent) {
 
   }
 
   @Override
   public boolean onSingleTapUp(MotionEvent motionEvent) {
-    return true;
-  }
-
-  @Override
-  public boolean onScroll(MotionEvent event1, MotionEvent event2,
-                          float distanceX, float distanceY) {
-    renderer.setMotion(distanceX, distanceY);
     return true;
   }
 
@@ -106,16 +89,10 @@ public class SurfaceView extends GLSurfaceView implements GestureDetector.OnGest
   @Override
   public boolean onFling(MotionEvent motionEvent1, MotionEvent motionEvent2,
                          float v1, float v2) {
-    //сильное нажатие
     return true;
   }
-
 
   public SceneRenderer getSceneRenderer() {
     return renderer;
   }
-
-
-
-
 }

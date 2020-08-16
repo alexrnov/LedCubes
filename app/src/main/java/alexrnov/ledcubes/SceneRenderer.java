@@ -75,10 +75,10 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     float aspect = (float) width / (float) height;
     float k = 1f / 30; // coefficient is selected empirically
 
-    if (width < height) {
+    if (width < height) { // portrait orientation
       Matrix.frustumM(projectionMatrix, 0, -1f * k, 1f * k,
               (1/-aspect) * k, (1/aspect) * k, 0.1f, 40f);
-    } else {
+    } else { // landscape orientation
       Matrix.frustumM(projectionMatrix, 0, -aspect * k,
               aspect * k, -1f * k, 1f * k, 0.1f, 40f);
     }

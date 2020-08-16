@@ -75,7 +75,10 @@ class MainActivity : AppCompatActivity() {
           }
           surfaceView?.sceneRenderer?.setColor(i, color) // change color the current cube
           i += 1
-          if (i == 512) this.cancel()
+          if (i == 512) {
+            i = 0
+            this.cancel()
+          }
         }
       }
     }, 0, 30) // change color every 30 ms
