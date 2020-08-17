@@ -10,6 +10,7 @@ public class BasicColor {
    * @param color - color as RGBA format
    * @return - color with shades for cube
    */
+  /*
   public static float[][] shades(float[] color) {
     float[][] colorWithShades = new float[6][4];
     // front face
@@ -25,6 +26,23 @@ public class BasicColor {
     // down face
     colorWithShades[5] = new float[] {color[0] * 0.6f, color[1] * 0.6f, color[2] * 0.6f, 1.0f};
 
+    return colorWithShades;
+  }
+   */
+
+  /**
+   * Create shades of color.
+   * @param color - color as RGBA format
+   * @return - color with shades for cube
+   */
+  public static float[][] shades(float[] color) {
+    float[][] colorWithShades = new float[3][4];
+    // front face
+    colorWithShades[0] = new float[] {color[0], color[1], color[2], 1.0f};
+    // one color for other three faces
+    colorWithShades[1] = new float[] {color[0] * 0.7f, color[1] * 0.7f, color[2] * 0.7f, 1.0f };
+    // top and down faces
+    colorWithShades[2] = new float[] {color[0] * 0.9f, color[1] * 0.9f, color[2] * 0.9f, 1.0f };
     return colorWithShades;
   }
 

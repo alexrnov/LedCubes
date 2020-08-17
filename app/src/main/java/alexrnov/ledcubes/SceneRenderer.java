@@ -5,6 +5,9 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.Log;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.util.Arrays;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -37,18 +40,89 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   private boolean initCubes = false;
   private float[][] defaultColor = shades(BasicColor.gray());
 
+  private final int[] VBO = new int[1];
+
   public SceneRenderer(int versionGL) {
     this.versionGL = versionGL;
   }
 
   @Override
   public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+    float size = 0.024f;
+    float[] vertices = new float[] {
+            -size, size, size, -size, -size, size, size, -size, size, size, -size, size,
+            size, size, size, -size, size, size, -size, size, -size, -size, -size, -size,
+            size, -size, -size, size, -size, -size, size, size, -size, -size, size, -size,
+            -size, size, -size, -size, -size, -size, -size, -size, size, -size, -size, size,
+            -size, size, size, -size, size, -size, size, size, -size, size, -size, -size,
+            size, -size, size, size, -size, size, size, size, size, size, size, -size,
+            -size, size, -size, -size, size, size, size, size, size, size, size, size,
+            size, size, -size, -size, size, -size, -size, -size, -size, -size, -size, size,
+            size, -size, size, size, -size, size, size, -size, -size, -size, -size, -size };
+
+    FloatBuffer bufferVertices = ByteBuffer.allocateDirect(vertices.length * 4)
+            .order(ByteOrder.nativeOrder()).asFloatBuffer();
+    bufferVertices.put(vertices).position(0);
+
+    String vShader, fShader;
+    if (versionGL == 2) { // version is OpenGL ES 2.0
+      vShader =
+              "#version 100                                            \n" +
+                      "uniform mat4 mvp_matrix;                       \n" +
+                      "attribute vec4 a_position;                        \n" +
+                      "void main()                                               \n" +
+                      "{                                                              \n" +
+                      "gl_Position = mvp_matrix * a_position;  \n" +
+                      "}                                                              \n";
+
+      fShader =
+              "#version 100                                           \n" +
+                      "precision lowp float;                                 \n" +
+                      "uniform vec4 v_color;                              \n" +
+                      "void main()                                              \n" +
+                      "{                                                              \n" +
+                      "gl_FragColor = v_color;                         \n" +
+                      "}                                                              \n";
+
+    } else { // version OpenGL ES 3.0 or higher
+      vShader =
+              "#version 300 es                                      \n" +
+                      "uniform mat4 mvp_matrix;                      \n" +
+                      "in vec4 a_position;                                   \n" +
+                      "void main()                                               \n" +
+                      "{                                                              \n" +
+                      "gl_Position = mvp_matrix * a_position;  \n" +
+                      "}                                                              \n";
+
+      fShader =
+              "#version 300 es                                      \n" +
+                      "precision lowp float;                                \n" +
+                      "uniform vec4 v_color;                              \n" +
+                      "out vec4 fragColor;                                  \n" +
+                      "void main()                                               \n" +
+                      "{                                                              \n" +
+                      "fragColor = v_color;                               \n" +
+                      "}                                                               \n";
+    }
+
+
+
     Matrix.setLookAtM(viewMatrix, 0, xCamera, yCamera, zCamera,
             0.0f, 0.0f, 0f, 0f, 1.0f, 0.0f);
 
     GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     // implementation prioritizes performance
     GLES20.glHint(GLES20.GL_GENERATE_MIPMAP_HINT, GLES20.GL_FASTEST);
+
+
+    VBO[0] = 0;
+    GLES20.glGenBuffers(1, VBO, 0);
+    bufferVertices.position(0);
+    GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, VBO[0]);
+    // 12 is the float_size (4) * component of vertex (3), 36 is the number of vertex
+    GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, 12 * 36,
+            bufferVertices, GLES20.GL_STATIC_DRAW);
+
 
     int i = 0; // id of cube
     for (int kz = -4; kz < 4; kz++) {
@@ -57,7 +131,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
         float y = ky * 0.10f - 0.04f;
         for (int kx = 4; kx > -4; kx--) { // start position of lowest right angle
           float x = kx * 0.10f - 0.04f;
-          cubes[i] = new Cube(0.024f, versionGL);
+          cubes[i] = new Cube(bufferVertices, vShader, fShader);
           cubes[i].setPosition(x, y, z);
           cubes[i].setColor(defaultColor);
           i++;
@@ -98,11 +172,15 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
     // apply immutable matrix to avoid flicker artifact
     final float[] immutableViewMatrix = Arrays.copyOf(viewMatrix, 16);
+
+    GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, VBO[0]);
     for (int i = 0; i < NUMBER_CUBES; i++) {
       // invoke every frame to avoid flickering when rotating
       cubes[i].defineView(immutableViewMatrix, projectionMatrix);
       cubes[i].draw();
     }
+
+    GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
   }
 
   /** Set camera in default place */
