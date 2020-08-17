@@ -48,7 +48,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
   @Override
   public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-    float size = 0.024f;
+    float size = 0.024f; // size of cube
     float[] vertices = new float[] {
             -size, size, size, -size, -size, size, size, -size, size, size, -size, size,
             size, size, size, -size, size, size, -size, size, -size, -size, -size, -size,
@@ -105,15 +105,12 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
                       "}                                                               \n";
     }
 
-
-
     Matrix.setLookAtM(viewMatrix, 0, xCamera, yCamera, zCamera,
             0.0f, 0.0f, 0f, 0f, 1.0f, 0.0f);
 
     GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     // implementation prioritizes performance
     GLES20.glHint(GLES20.GL_GENERATE_MIPMAP_HINT, GLES20.GL_FASTEST);
-
 
     VBO[0] = 0;
     GLES20.glGenBuffers(1, VBO, 0);
@@ -122,7 +119,6 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     // 12 is the float_size (4) * component of vertex (3), 36 is the number of vertex
     GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, 12 * 36,
             bufferVertices, GLES20.GL_STATIC_DRAW);
-
 
     int i = 0; // id of cube
     for (int kz = -4; kz < 4; kz++) {
