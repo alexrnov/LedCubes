@@ -26,7 +26,7 @@ public class Cube {
 
   private float[][] color; // color of cube
 
-  private FloatBuffer bufferVertices;
+  private final int[] VBO = new int[1];
 
   /**
    * Create a cube of a specific size
@@ -46,7 +46,7 @@ public class Cube {
             size, size, -size, -size, size, -size, -size, -size, -size, -size, -size, size,
             size, -size, size, size, -size, size, size, -size, -size, -size, -size, -size };
 
-    bufferVertices = ByteBuffer.allocateDirect(vertices.length * 4)
+    FloatBuffer bufferVertices = ByteBuffer.allocateDirect(vertices.length * 4)
             .order(ByteOrder.nativeOrder()).asFloatBuffer();
     bufferVertices.put(vertices).position(0);
 
@@ -97,6 +97,15 @@ public class Cube {
     mvpMatrixLink = GLES20.glGetUniformLocation(this.programObject, "mvp_matrix");
     colorLink = GLES20.glGetUniformLocation(this.programObject, "v_color");
     positionLink = GLES20.glGetAttribLocation(programObject, "a_position");
+
+    /* create vertex buffer object */
+    VBO[0] = 0;
+    GLES20.glGenBuffers(1, VBO, 0);
+    bufferVertices.position(0);
+    GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, VBO[0]);
+    // 12 is the float_size (4) * component of vertex (3), 36 is the number of vertex
+    GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, 12 * 36,
+            bufferVertices, GLES20.GL_STATIC_DRAW);
   }
 
   /**
@@ -117,9 +126,17 @@ public class Cube {
     GLES20.glUseProgram(this.programObject);
     GLES20.glUniformMatrix4fv(mvpMatrixLink, 1, false, mvpMatrix, 0);
     GLES20.glEnableVertexAttribArray(positionLink);// allow cube vertices attribute
-    GLES20.glVertexAttribPointer(positionLink, 3, GLES20.GL_FLOAT, false, 0, bufferVertices);
 
-    /* different pseudo-shades for front faces */
+    // in case without VBO
+    //GLES20.glVertexAttribPointer(positionLink, 3, GLES20.GL_FLOAT, false, 0, bufferVertices);
+
+    // in case with VBO
+    GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, VBO[0]);
+    GLES20.glVertexAttribPointer(positionLink, 3, GLES20.GL_FLOAT,
+            false, 12, 0);
+    GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+
+    /* different pseudo-shades only for the front faces */
     // front face
     GLES20.glUniform4fv(colorLink, 1, color[0], 0); // pass color of face to shader
     GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6); // draw current face
@@ -139,7 +156,7 @@ public class Cube {
     // down face
     GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 30, 6);
 
-    /* different pseudo-shades for each face */
+    /* different pseudo-shades for the all faces */
     /*
     // front face
     GLES20.glUniform4fv(colorLink, 1, color[0], 0); // pass color of face to shader
