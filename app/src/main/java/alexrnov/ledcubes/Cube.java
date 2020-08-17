@@ -149,10 +149,8 @@ public class Cube {
 
     // one color for back faces
     GLES20.glUniform4fv(colorLink, 1, color[2], 0);
-    // back face
-    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 6, 6);
-    // back-side face
-    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 12, 6);
+    // back face and back-side face
+    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 6, 12);
     // down face
     GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 30, 6);
 
