@@ -127,7 +127,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
         float y = ky * 0.10f - 0.04f;
         for (int kx = 4; kx > -4; kx--) { // start position of lowest right angle
           float x = kx * 0.10f - 0.04f;
-          cubes[i] = new Cube(bufferVertices, vShader, fShader);
+          cubes[i] = new Cube(vShader, fShader);
           cubes[i].setPosition(x, y, z);
           cubes[i].setColor(defaultColor);
           i++;

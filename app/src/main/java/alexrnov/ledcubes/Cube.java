@@ -25,17 +25,16 @@ public class Cube {
   private float[][] color; // color of cube
 
   //private int[] vbo;
-  private FloatBuffer bufferVertices;
+  //private FloatBuffer bufferVertices;
   //private final int[] VBO = new int[1];
 
   /**
    * Create cube
-   * @param bufferVertices
    * @param vShader - code of vertex shader
    * @param fShader - code of fragment shader
    */
-  public Cube(FloatBuffer bufferVertices, String vShader, String fShader) {
-    this.bufferVertices = bufferVertices;
+  public Cube(String vShader, String fShader) {
+    //this.bufferVertices = bufferVertices;
     //this.vbo = vbo;
 
     LinkedProgram linkedProgram = new LinkedProgram(vShader, fShader);
