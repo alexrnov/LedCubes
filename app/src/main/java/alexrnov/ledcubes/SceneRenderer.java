@@ -50,19 +50,16 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
   private final int[] VBO = new int[1];
 
-  private List<Cube> list = new ArrayList<>();
-
+  private List<Cube> transparentObjects = new ArrayList<>();
+  // sort cubes by distance to camera for correct alpha blending
   private Comparator<Cube> comparatorByZ = (objectA, objectB) -> {
-
-    Float x1 = objectA.getX();
-    Float y1 = objectA.getY();
-    Float z1 = objectA.getZ();
-    Float x2 = objectB.getX();
-    Float y2 = objectB.getY();
-    Float z2 = objectB.getZ();
-    Double ab1 = Math.sqrt(Math.pow(xCamera2 - x1, 2.0) + Math.pow(yCamera2 - y1, 2.0) + Math.pow(zCamera2 - z1, 2.0));
-    Double ab2 = Math.sqrt(Math.pow(xCamera2 - x2, 2.0) + Math.pow(yCamera2 - y2, 2.0) + Math.pow(zCamera2 - z2, 2.0));
-    return ab2.compareTo(ab1);
+    Double cameraDistance1 = Math.sqrt(Math.pow(xCamera2 - objectA.getX(), 2.0)
+            + Math.pow(yCamera2 - objectA.getY(), 2.0)
+            + Math.pow(zCamera2 - objectA.getZ(), 2.0));
+    Double cameraDistance2 = Math.sqrt(Math.pow(xCamera2 - objectB.getX(), 2.0)
+            + Math.pow(yCamera2 - objectB.getY(), 2.0)
+            + Math.pow(zCamera2 - objectB.getZ(), 2.0));
+    return cameraDistance2.compareTo(cameraDistance1);
   };
 
   public SceneRenderer(int versionGL) {
@@ -158,7 +155,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
       }
     }
 
-    list.addAll(Arrays.asList(cubes).subList(0, NUMBER_CUBES));
+    transparentObjects.addAll(Arrays.asList(cubes).subList(0, NUMBER_CUBES));
 
     initCubes = true;
     // set default camera angle
@@ -195,20 +192,23 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     // apply immutable matrix to avoid flicker artifact
     final float[] immutableViewMatrix = Arrays.copyOf(viewMatrix, 16);
 
+    GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, VBO[0]);
+
+    /* when used blending */
+    // copy coordinates of camera that no happen thread error
     xCamera2 = this.xCamera;
     yCamera2 = this.yCamera;
     zCamera2 = this.zCamera;
-    Collections.sort(list, comparatorByZ);
-
-    GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, VBO[0]);
-
+    // sort by length to camera for correct transparency
+    Collections.sort(transparentObjects, comparatorByZ);
     GLES20.glEnable(GLES20.GL_BLEND);
     GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).defineView(immutableViewMatrix, projectionMatrix);
-      list.get(i).draw();
+    for (int i = 0; i < transparentObjects.size(); i++) {
+      transparentObjects.get(i).defineView(immutableViewMatrix, projectionMatrix);
+      transparentObjects.get(i).draw();
     }
     GLES20.glDisable(GLES20.GL_BLEND);
+    /* when blending is not used */
     /*
     for (int i = 0; i < NUMBER_CUBES; i++) {
       // invoke every frame to avoid flickering when rotating
