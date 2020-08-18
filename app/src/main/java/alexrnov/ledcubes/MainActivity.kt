@@ -67,11 +67,10 @@ class MainActivity : AppCompatActivity() {
         // check initialization of all cubes
         if (surfaceView?.sceneRenderer?.isLoad!!) {
 
+          // set all cubes default colors
           for (i in 0 until 512) {
             surfaceView?.sceneRenderer?.setColor(i, gray) // change color the current cube
-
           }
-
 
           val color:Array<FloatArray> = when (Random().nextInt(7)) {
             0 -> cyan
@@ -83,22 +82,23 @@ class MainActivity : AppCompatActivity() {
             else -> magenta
           }
 
+
           var k = Random().nextInt(6)
-          if (k == 0 || k == 1) k = 5
-          Log.i("P", "k = " + k)
+          if (k == 0 || k == 1 || k == 2 || k == 3) k = 5
           for (i in 0 until 512) {
             if (i % k == 0) {
               surfaceView?.sceneRenderer?.setColor(i, cyan) // change color the current cube
             }
           }
 
-
           //surfaceView?.sceneRenderer?.setColor(i, color) // change color the current cube
           i += 1
           if (i == 512) i = 0
+
+          surfaceView?.requestRender() // refresh frame
         }
       }
-    }, 0, 500) // change color every 30 ms
+    }, 0, 100) // change color every 30 ms
 
     surfaceView?.onResume()
   }

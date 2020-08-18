@@ -187,7 +187,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   public void onDrawFrame(GL10 gl) {
     spentTime = System.currentTimeMillis() - pastTime;
     pastTime = System.currentTimeMillis();
-    //Log.v("P", "spentTime (fps) = " + spentTime);
+    Log.v("P", "spentTime (fps) = " + spentTime);
     // set color buffer
     GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
     GLES20.glEnable(GLES20.GL_DEPTH_TEST); // enable depth test
@@ -211,6 +211,8 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
       transparentObjects.get(i).draw();
     }
     GLES20.glDisable(GLES20.GL_BLEND);
+
+
     /* when blending is not used */
     /*
     for (int i = 0; i < NUMBER_CUBES; i++) {

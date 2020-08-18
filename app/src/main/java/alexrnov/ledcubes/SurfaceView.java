@@ -30,6 +30,7 @@ public class SurfaceView extends GLSurfaceView implements GestureDetector.OnGest
     setEGLContextClientVersion(versionGLES);
     renderer = new SceneRenderer(versionGLES);
     setRenderer(renderer);
+    setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     detector = new GestureDetectorCompat(context, this);
     detector.setOnDoubleTapListener(this); // set gesture detector as double tap listener
   }
