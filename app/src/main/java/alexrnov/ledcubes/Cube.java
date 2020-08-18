@@ -24,6 +24,9 @@ public class Cube {
 
   private float[][] color; // color of cube
 
+  private float x = 0.0f;
+  private float y = 0.0f;
+  private float z = 0.0f;
   //private int[] vbo;
   //private FloatBuffer bufferVertices;
   //private final int[] VBO = new int[1];
@@ -136,7 +139,22 @@ public class Cube {
    * @param z - coordinate z
    */
   public void setPosition(float x, float y, float z) {
+    this.x = x;
+    this.y = z;
+    this.z = z;
     Matrix.setIdentityM(modelMatrix, 0); // reset matrix to one
     Matrix.translateM(modelMatrix, 0, x, y, z); // move cube
+  }
+
+  public float getX() {
+    return x;
+  }
+
+  public float getY() {
+    return y;
+  }
+
+  public float getZ() {
+    return z;
   }
 }
