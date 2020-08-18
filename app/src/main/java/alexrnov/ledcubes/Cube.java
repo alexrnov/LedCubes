@@ -27,36 +27,16 @@ public class Cube {
   private float x = 0.0f;
   private float y = 0.0f;
   private float z = 0.0f;
-  //private int[] vbo;
-  //private FloatBuffer bufferVertices;
-  //private final int[] VBO = new int[1];
 
   /**
    * Create cube
-   * @param vShader - code of vertex shader
-   * @param fShader - code of fragment shader
+   * @param programObject - объект программы
    */
-  public Cube(String vShader, String fShader) {
-    //this.bufferVertices = bufferVertices;
-    //this.vbo = vbo;
-
-    LinkedProgram linkedProgram = new LinkedProgram(vShader, fShader);
-    programObject = linkedProgram.get();
-
+  public Cube(int programObject) {
+    this.programObject = programObject;
     mvpMatrixLink = GLES20.glGetUniformLocation(this.programObject, "mvp_matrix");
     colorLink = GLES20.glGetUniformLocation(this.programObject, "v_color");
     positionLink = GLES20.glGetAttribLocation(programObject, "a_position");
-
-    /* create vertex buffer object */
-    /*
-    VBO[0] = 0;
-    GLES20.glGenBuffers(1, VBO, 0);
-    bufferVertices.position(0);
-    GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, VBO[0]);
-    // 12 is the float_size (4) * component of vertex (3), 36 is the number of vertex
-    GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, 12 * 36,
-            bufferVertices, GLES20.GL_STATIC_DRAW);
-    */
   }
 
   /**
@@ -81,12 +61,8 @@ public class Cube {
     // in case without VBO
     //GLES20.glVertexAttribPointer(positionLink, 3, GLES20.GL_FLOAT, false, 0, bufferVertices);
 
-    // in case with VBO
-
-    //GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vbo[0]);
     GLES20.glVertexAttribPointer(positionLink, 3, GLES20.GL_FLOAT,
             false, 12, 0);
-    //GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
     /* different pseudo-shades only for the front faces */
     // front face
