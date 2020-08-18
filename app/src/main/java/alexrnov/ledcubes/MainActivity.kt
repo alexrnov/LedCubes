@@ -4,6 +4,7 @@ import alexrnov.ledcubes.BasicColor.shades
 import android.app.ActivityManager
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 
@@ -21,6 +22,7 @@ class MainActivity : AppCompatActivity() {
   private val yellow = shades(BasicColor.yellow())
   private val white = shades(BasicColor.white())
   private val magenta = shades(BasicColor.magenta())
+  private val gray = shades(BasicColor.gray())
 
   /*
    * Checking the OpenGL version on the device at runtime. The manifest declares
@@ -64,6 +66,13 @@ class MainActivity : AppCompatActivity() {
       override fun run() {
         // check initialization of all cubes
         if (surfaceView?.sceneRenderer?.isLoad!!) {
+
+          for (i in 0 until 512) {
+            surfaceView?.sceneRenderer?.setColor(i, gray) // change color the current cube
+
+          }
+
+
           val color:Array<FloatArray> = when (Random().nextInt(7)) {
             0 -> cyan
             1 -> red
@@ -73,12 +82,23 @@ class MainActivity : AppCompatActivity() {
             5 -> yellow
             else -> magenta
           }
-          surfaceView?.sceneRenderer?.setColor(i, color) // change color the current cube
+
+          var k = Random().nextInt(6)
+          if (k == 0 || k == 1) k = 5
+          Log.i("P", "k = " + k)
+          for (i in 0 until 512) {
+            if (i % k == 0) {
+              surfaceView?.sceneRenderer?.setColor(i, cyan) // change color the current cube
+            }
+          }
+
+
+          //surfaceView?.sceneRenderer?.setColor(i, color) // change color the current cube
           i += 1
           if (i == 512) i = 0
         }
       }
-    }, 0, 30) // change color every 30 ms
+    }, 0, 500) // change color every 30 ms
 
     surfaceView?.onResume()
   }
