@@ -68,9 +68,12 @@ class MainActivity : AppCompatActivity() {
         if (surfaceView?.sceneRenderer?.isLoad!!) {
 
           // set all cubes default colors
+          /*
           for (i in 0 until 512) {
             surfaceView?.sceneRenderer?.setColor(i, gray) // change color the current cube
           }
+
+           */
 
           val color:Array<FloatArray> = when (Random().nextInt(7)) {
             0 -> cyan
@@ -86,7 +89,7 @@ class MainActivity : AppCompatActivity() {
           var k = Random().nextInt(6)
           if (k == 0 || k == 1 || k == 2 || k == 3) k = 5
           for (i in 0 until 512) {
-            if (i % 10 == 0) {
+            if (i % k == 0) {
               surfaceView?.sceneRenderer?.setColor(i, cyan) // change color the current cube
             }
           }
