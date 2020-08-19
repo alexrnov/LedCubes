@@ -74,23 +74,22 @@ class MainActivity : AppCompatActivity() {
           }
 
            */
-
-          val color:Array<FloatArray> = when (Random().nextInt(7)) {
-            0 -> cyan
-            1 -> red
-            2 -> blue
-            3 -> green
-            4 -> white
-            5 -> yellow
-            else -> magenta
-          }
-
-
-          var k = Random().nextInt(6)
-          if (k == 0 || k == 1 || k == 2 || k == 3) k = 5
           for (i in 0 until 512) {
-            if (i % k == 0) {
-              surfaceView?.sceneRenderer?.setColor(i, cyan) // change color the current cube
+            if (true) {
+              if (i % 10 == 0) {
+                surfaceView?.sceneRenderer?.setColor(i, cyan) // change color the current cube
+              }
+            } else {
+              val color:Array<FloatArray> = when (Random().nextInt(7)) {
+                0 -> cyan
+                1 -> red
+                2 -> blue
+                3 -> green
+                4 -> white
+                5 -> yellow
+                else -> magenta
+              }
+              surfaceView?.sceneRenderer?.setColor(i, color)
             }
           }
 
