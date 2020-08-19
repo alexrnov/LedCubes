@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity() {
           var k = Random().nextInt(6)
           if (k == 0 || k == 1 || k == 2 || k == 3) k = 5
           for (i in 0 until 512) {
-            if (i % k == 0) {
+            if (i % 10 == 0) {
               surfaceView?.sceneRenderer?.setColor(i, cyan) // change color the current cube
             }
           }
@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity() {
           surfaceView?.requestRender() // refresh frame
         }
       }
-    }, 0, 100) // change color every 30 ms
+    }, 0, 30) // change color every 30 ms
 
     surfaceView?.onResume()
   }

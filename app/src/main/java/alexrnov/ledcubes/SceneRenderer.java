@@ -180,6 +180,12 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
       Matrix.frustumM(projectionMatrix, 0, -aspect * k,
               aspect * k, -1f * k, 1f * k, 0.1f, 40f);
     }
+
+
+    for (int i = 0; i < transparentObjects.size(); i++) {
+      transparentObjects.get(i).defineView(viewMatrix, projectionMatrix);
+
+    }
   }
 
   // called when the frame is redrawn
@@ -193,12 +199,13 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     GLES20.glEnable(GLES20.GL_DEPTH_TEST); // enable depth test
 
     // apply immutable matrix to avoid flicker artifact
-    final float[] immutableViewMatrix = Arrays.copyOf(viewMatrix, 16);
+    //final float[] immutableViewMatrix = Arrays.copyOf(viewMatrix, 16);
 
     GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, VBO[0]);
 
     /* when used blending */
     // copy coordinates of camera that no happen thread error
+
     xCamera2 = this.xCamera;
     yCamera2 = this.yCamera;
     zCamera2 = this.zCamera;
@@ -207,20 +214,23 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     GLES20.glEnable(GLES20.GL_BLEND);
     GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
     for (int i = 0; i < transparentObjects.size(); i++) {
-      transparentObjects.get(i).defineView(immutableViewMatrix, projectionMatrix);
+      //transparentObjects.get(i).defineView(immutableViewMatrix, projectionMatrix);
       transparentObjects.get(i).draw();
     }
     GLES20.glDisable(GLES20.GL_BLEND);
+
 
 
     /* when blending is not used */
     /*
     for (int i = 0; i < NUMBER_CUBES; i++) {
       // invoke every frame to avoid flickering when rotating
-      cubes[i].defineView(immutableViewMatrix, projectionMatrix);
+      //cubes[i].defineView(immutableViewMatrix, projectionMatrix);
       cubes[i].draw();
     }
-    */
+
+     */
+
     GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
   }
 
@@ -260,6 +270,11 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     // set position for camera
     Matrix.setLookAtM(viewMatrix, 0, xCamera, -yCamera, zCamera,
             0f, 0.0f, 0f, 0f, 1.0f, 0.0f);
+
+    for (int i = 0; i < transparentObjects.size(); i++) {
+      transparentObjects.get(i).defineView(viewMatrix, projectionMatrix);
+    }
+
   }
 
   /**

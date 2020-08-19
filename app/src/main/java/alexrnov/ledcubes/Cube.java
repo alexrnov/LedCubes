@@ -64,7 +64,11 @@ public class Cube {
     GLES20.glVertexAttribPointer(positionLink, 3, GLES20.GL_FLOAT,
             false, 12, 0);
 
+    GLES20.glUniform4fv(colorLink, 1, color[0], 0); // pass color of face to shader
+    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 36);
+
     /* different pseudo-shades only for the front faces */
+    /*
     // front face
     GLES20.glUniform4fv(colorLink, 1, color[0], 0); // pass color of face to shader
     GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6); // draw current face
@@ -74,6 +78,7 @@ public class Cube {
     // top and down faces
     GLES20.glUniform4fv(colorLink, 1, color[2], 0);
     GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 24, 12);
+    */
 
     /* different pseudo-shades for the all faces */
     /*
