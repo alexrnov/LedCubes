@@ -51,7 +51,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
   private final int[] VBO = new int[1];
 
-  private boolean changeView = false; // this flag check if camera was moved
+  private volatile boolean changeView = false; // this flag check if camera was moved
 
   private List<Cube> transparentObjects = new ArrayList<>();
 
