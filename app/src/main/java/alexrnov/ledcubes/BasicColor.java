@@ -35,6 +35,7 @@ public class BasicColor {
    * @param color - color as RGBA format
    * @return - color with shades for cube
    */
+  /*
   public static float[][] shades(float[] color) {
     float[][] colorWithShades = new float[3][4];
     // front face
@@ -45,7 +46,12 @@ public class BasicColor {
     colorWithShades[2] = new float[] {color[0] * 0.9f, color[1] * 0.9f, color[2] * 0.9f, 0.4f };
     return colorWithShades;
   }
+  */
 
+  public static float[] transparent(float[] color, float alpha) {
+    color[3] = alpha;
+    return color;
+  }
   /*
    * Created by Seker on 7/1/2015.
    * Some color static methods so I can setup the color quickly and not think hard either.

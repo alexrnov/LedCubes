@@ -1,6 +1,6 @@
 package alexrnov.ledcubes
 
-import alexrnov.ledcubes.BasicColor.shades
+import alexrnov.ledcubes.BasicColor.transparent
 import android.app.ActivityManager
 import android.content.Context
 import android.os.Bundle
@@ -15,14 +15,14 @@ class MainActivity : AppCompatActivity() {
    * Colors with shades for different faces. Lighting is not computed
    * in the shader for performance reasons.
    */
-  private val cyan: Array<FloatArray> = shades(BasicColor.cyan())
-  private val red = shades(BasicColor.red())
-  private val blue = shades(BasicColor.blue())
-  private val green = shades(BasicColor.green())
-  private val yellow = shades(BasicColor.yellow())
-  private val white = shades(BasicColor.white())
-  private val magenta = shades(BasicColor.magenta())
-  private val gray = shades(BasicColor.gray())
+  private val cyan = transparent(BasicColor.cyan(), 0.5f)
+  private val red = transparent(BasicColor.red(), 0.5f)
+  private val blue = transparent(BasicColor.blue(), 0.5f)
+  private val green = transparent(BasicColor.green(), 0.5f)
+  private val yellow = transparent(BasicColor.yellow(), 0.5f)
+  private val white = transparent(BasicColor.white(), 0.5f)
+  private val magenta = transparent(BasicColor.magenta(), 0.5f)
+  private val gray = transparent(BasicColor.gray(), 0.2f)
 
   /*
    * Checking the OpenGL version on the device at runtime. The manifest declares
@@ -66,40 +66,36 @@ class MainActivity : AppCompatActivity() {
       override fun run() {
         // check initialization of all cubes
         if (surfaceView?.sceneRenderer?.isLoad!!) {
-
-          // set all cubes default colors
           var k = Random().nextInt(20)
-          if (k == 0) {
-            k = 1
+          k = if (k == 0) {
+            1
           } else {
-            k = 9
+            9
           }
-          for (i in 0 until 512) {
 
+          /* pass all array that not flashes */
+          for (i in 0 until 512) {
             if (i % k == 0) {
               surfaceView?.sceneRenderer?.setColor(i, cyan) // change color the current cube
             } else {
-              surfaceView?.sceneRenderer?.setColor(i, gray) // change color the current cube
+              surfaceView?.sceneRenderer?.setColor(i, gray) // turn off leds
             }
-
           }
 
-
-          val color:Array<FloatArray> = when (Random().nextInt(7)) {
-                0 -> cyan
-                1 -> red
-                2 -> blue
-                3 -> green
-                4 -> white
-                5 -> yellow
-                else -> magenta
-              }
-
-
-          //surfaceView?.sceneRenderer?.setColor(i, color) // change color the current cube
+          /*
+          val color:FloatArray = when (Random().nextInt(7)) {
+            0 -> cyan
+            1 -> red
+            2 -> blue
+            3 -> green
+            4 -> white
+            5 -> yellow
+            else -> magenta
+          }
+          surfaceView?.sceneRenderer?.setColor(i, color) // change color the current cube
           i += 1
           if (i == 512) i = 0
-
+          */
           surfaceView?.requestRender() // refresh frame
         }
       }

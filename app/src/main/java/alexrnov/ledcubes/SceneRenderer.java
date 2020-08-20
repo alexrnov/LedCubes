@@ -17,21 +17,22 @@ import java.util.List;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import static alexrnov.ledcubes.BasicColor.shades;
+import static alexrnov.ledcubes.BasicColor.transparent;
 
 public class SceneRenderer implements GLSurfaceView.Renderer {
 
-  private int versionGL;
+  private int versionGL; // support version of OpenGL ES
 
   // coefficients for camera rotation
   private float kx = 0f;
   private float ky = 0f;
 
-  // coordinates of camera
+  /* coordinates of camera */
   private float xCamera = 0.0f;
   private float yCamera = 0.0f;
   private float zCamera = 2.6f;
 
+  /* coordinates of camera for thread-safe distance calculations */
   private float xCamera2 = 0.0f;
   private float yCamera2 = 0.0f;
   private float zCamera2 = 2.6f;
@@ -42,17 +43,18 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   private float[] viewMatrix = new float[16];
   private float[] projectionMatrix = new float[16];
 
-  private long pastTime = System.currentTimeMillis();
-  private long spentTime = System.currentTimeMillis();
+  //private long pastTime = System.currentTimeMillis();
+  //private long spentTime = System.currentTimeMillis();
 
-  private boolean initCubes = false;
-  private float[][] defaultColor = shades(BasicColor.gray());
+  private boolean initCubes = false; // this flag check if all objects was init
+  private float[] defaultColor = transparent(BasicColor.gray(), 0.5f);
 
   private final int[] VBO = new int[1];
 
-  private boolean changeView = false;
+  private boolean changeView = false; // this flag check if camera was moved
 
   private List<Cube> transparentObjects = new ArrayList<>();
+
   // sort cubes by distance to camera for correct alpha blending
   private Comparator<Cube> comparatorByZ = (objectA, objectB) -> {
     Double cameraDistance1 = Math.sqrt(Math.pow(xCamera2 - objectA.getX(), 2.0)
@@ -162,7 +164,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
     transparentObjects.addAll(Arrays.asList(cubes).subList(0, NUMBER_CUBES));
 
-    initCubes = true;
+    initCubes = true; // init finish
     // set default camera angle
     this.setMotion(900.0f, -350.0f);
   }
@@ -183,16 +185,15 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
               aspect * k, -1f * k, 1f * k, 0.1f, 40f);
     }
 
-    for (int i = 0; i < transparentObjects.size(); i++) {
-      transparentObjects.get(i).defineView(viewMatrix, projectionMatrix);
-    }
+    /* set default view for scene */
+    for (Cube cube: transparentObjects) cube.defineView(viewMatrix, projectionMatrix);
   }
 
   // called when the frame is redrawn
   @Override
   public void onDrawFrame(GL10 gl) {
-    spentTime = System.currentTimeMillis() - pastTime;
-    pastTime = System.currentTimeMillis();
+    //spentTime = System.currentTimeMillis() - pastTime;
+    //pastTime = System.currentTimeMillis();
     //Log.v("P", "spentTime (fps) = " + spentTime);
     // set color buffer
     GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
@@ -202,7 +203,6 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
     /* when used blending */
     // copy coordinates of camera that no happen thread error
-
     xCamera2 = this.xCamera;
     yCamera2 = this.yCamera;
     zCamera2 = this.zCamera;
@@ -211,25 +211,18 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     GLES20.glEnable(GLES20.GL_BLEND);
     GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
-    if (changeView) {
+    if (changeView) { // if the camera was moved then perform matrix calculation
       // apply immutable matrix to avoid flicker artifact
       final float[] immutableViewMatrix = Arrays.copyOf(viewMatrix, 16);
-      for (int i = 0; i < transparentObjects.size(); i++) {
-        transparentObjects.get(i).defineView(immutableViewMatrix, projectionMatrix);
-        transparentObjects.get(i).draw();
-      }
+      for (Cube cube: transparentObjects) cube.defineView(immutableViewMatrix, projectionMatrix);
       changeView = false;
-    } else {
-      for (int i = 0; i < transparentObjects.size(); i++) {
-        transparentObjects.get(i).draw();
-      }
     }
 
-
+    for (int i = 0; i < transparentObjects.size(); i++) {
+      transparentObjects.get(i).draw();
+    }
 
     GLES20.glDisable(GLES20.GL_BLEND);
-
-
 
     /* when blending is not used */
     /*
@@ -238,9 +231,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
       //cubes[i].defineView(immutableViewMatrix, projectionMatrix);
       cubes[i].draw();
     }
-
-     */
-
+    */
     GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
   }
 
@@ -281,7 +272,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     Matrix.setLookAtM(viewMatrix, 0, xCamera, -yCamera, zCamera,
             0f, 0.0f, 0f, 0f, 1.0f, 0.0f);
 
-    changeView = true;
+    changeView = true; // in next frame perform calculation matrix
   }
 
   /**
@@ -298,7 +289,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
    * @param i - id of cube
    * @param color - current color of cube
    */
-  public synchronized void setColor(int i, float[][] color) {
+  public synchronized void setColor(int i, float[] color) {
     cubes[i].setColor(color);
   }
 }
