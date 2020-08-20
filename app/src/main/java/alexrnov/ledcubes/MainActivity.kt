@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
             9
           }
 
-          /* pass all array that not flashes */
+          /* pass all array that not flickers */
           for (i in 0 until 512) {
             if (i % k == 0) {
               surfaceView?.sceneRenderer?.setColor(i, cyan) // change color the current cube
