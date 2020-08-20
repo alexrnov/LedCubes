@@ -68,19 +68,24 @@ class MainActivity : AppCompatActivity() {
         if (surfaceView?.sceneRenderer?.isLoad!!) {
 
           // set all cubes default colors
-          /*
+          var k = Random().nextInt(20)
+          if (k == 0) {
+            k = 1
+          } else {
+            k = 9
+          }
           for (i in 0 until 512) {
-            surfaceView?.sceneRenderer?.setColor(i, gray) // change color the current cube
+
+            if (i % k == 0) {
+              surfaceView?.sceneRenderer?.setColor(i, cyan) // change color the current cube
+            } else {
+              surfaceView?.sceneRenderer?.setColor(i, gray) // change color the current cube
+            }
+
           }
 
-           */
-          for (i in 0 until 512) {
-            if (true) {
-              if (i % 10 == 0) {
-                surfaceView?.sceneRenderer?.setColor(i, cyan) // change color the current cube
-              }
-            } else {
-              val color:Array<FloatArray> = when (Random().nextInt(7)) {
+
+          val color:Array<FloatArray> = when (Random().nextInt(7)) {
                 0 -> cyan
                 1 -> red
                 2 -> blue
@@ -89,9 +94,7 @@ class MainActivity : AppCompatActivity() {
                 5 -> yellow
                 else -> magenta
               }
-              surfaceView?.sceneRenderer?.setColor(i, color)
-            }
-          }
+
 
           //surfaceView?.sceneRenderer?.setColor(i, color) // change color the current cube
           i += 1

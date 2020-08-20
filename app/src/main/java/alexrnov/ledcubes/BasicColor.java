@@ -38,11 +38,11 @@ public class BasicColor {
   public static float[][] shades(float[] color) {
     float[][] colorWithShades = new float[3][4];
     // front face
-    colorWithShades[0] = new float[] {color[0], color[1], color[2], 0.6f };
+    colorWithShades[0] = new float[] {color[0], color[1], color[2], 0.4f };
     // one color for other three faces
-    colorWithShades[1] = new float[] {color[0] * 0.7f, color[1] * 0.7f, color[2] * 0.7f, 0.6f };
+    colorWithShades[1] = new float[] {color[0] * 0.7f, color[1] * 0.7f, color[2] * 0.7f, 0.4f };
     // top and down faces
-    colorWithShades[2] = new float[] {color[0] * 0.9f, color[1] * 0.9f, color[2] * 0.9f, 0.6f };
+    colorWithShades[2] = new float[] {color[0] * 0.9f, color[1] * 0.9f, color[2] * 0.9f, 0.4f };
     return colorWithShades;
   }
 
@@ -114,4 +114,7 @@ public class BasicColor {
             Color.blue(Color.WHITE) / 255f,
             1.0f };
   }
+
+
+
 }

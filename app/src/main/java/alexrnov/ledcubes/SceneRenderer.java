@@ -50,6 +50,8 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
   private final int[] VBO = new int[1];
 
+  private boolean changeView = false;
+
   private List<Cube> transparentObjects = new ArrayList<>();
   // sort cubes by distance to camera for correct alpha blending
   private Comparator<Cube> comparatorByZ = (objectA, objectB) -> {
@@ -181,13 +183,12 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
               aspect * k, -1f * k, 1f * k, 0.1f, 40f);
     }
 
-    /*
+
     for (int i = 0; i < transparentObjects.size(); i++) {
       transparentObjects.get(i).defineView(viewMatrix, projectionMatrix);
 
     }
 
-     */
   }
 
   // called when the frame is redrawn
@@ -195,13 +196,10 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   public void onDrawFrame(GL10 gl) {
     spentTime = System.currentTimeMillis() - pastTime;
     pastTime = System.currentTimeMillis();
-    Log.v("P", "spentTime (fps) = " + spentTime);
+    //Log.v("P", "spentTime (fps) = " + spentTime);
     // set color buffer
     GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
     GLES20.glEnable(GLES20.GL_DEPTH_TEST); // enable depth test
-
-    // apply immutable matrix to avoid flicker artifact
-    final float[] immutableViewMatrix = Arrays.copyOf(viewMatrix, 16);
 
     GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, VBO[0]);
 
@@ -215,10 +213,23 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     Collections.sort(transparentObjects, comparatorByZ);
     GLES20.glEnable(GLES20.GL_BLEND);
     GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-    for (int i = 0; i < transparentObjects.size(); i++) {
-      transparentObjects.get(i).defineView(immutableViewMatrix, projectionMatrix);
-      transparentObjects.get(i).draw();
+
+    if (changeView) {
+      // apply immutable matrix to avoid flicker artifact
+      final float[] immutableViewMatrix = Arrays.copyOf(viewMatrix, 16);
+      for (int i = 0; i < transparentObjects.size(); i++) {
+        transparentObjects.get(i).defineView(immutableViewMatrix, projectionMatrix);
+        transparentObjects.get(i).draw();
+      }
+      changeView = false;
+    } else {
+      for (int i = 0; i < transparentObjects.size(); i++) {
+        transparentObjects.get(i).draw();
+      }
     }
+
+
+
     GLES20.glDisable(GLES20.GL_BLEND);
 
 
@@ -273,13 +284,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     Matrix.setLookAtM(viewMatrix, 0, xCamera, -yCamera, zCamera,
             0f, 0.0f, 0f, 0f, 1.0f, 0.0f);
 
-    /*
-    for (int i = 0; i < transparentObjects.size(); i++) {
-      transparentObjects.get(i).defineView(viewMatrix, projectionMatrix);
-    }
-
-
-     */
+    changeView = true;
   }
 
   /**
