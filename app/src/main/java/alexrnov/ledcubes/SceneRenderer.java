@@ -187,6 +187,9 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
     /* set default view for scene */
     for (Cube cube: transparentObjects) cube.defineView(viewMatrix, projectionMatrix);
+
+    // sort by length to camera for correct transparency
+    Collections.sort(transparentObjects, comparatorByZ);
   }
 
   // called when the frame is redrawn
@@ -202,12 +205,6 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
     GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, VBO[0]);
 
     /* when used blending */
-    // copy coordinates of camera that no happen thread error
-    xCamera2 = this.xCamera;
-    yCamera2 = this.yCamera;
-    zCamera2 = this.zCamera;
-    // sort by length to camera for correct transparency
-    Collections.sort(transparentObjects, comparatorByZ);
     GLES20.glEnable(GLES20.GL_BLEND);
     GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
@@ -216,6 +213,13 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
       final float[] immutableViewMatrix = Arrays.copyOf(viewMatrix, 16);
       for (Cube cube: transparentObjects) cube.defineView(immutableViewMatrix, projectionMatrix);
       changeView = false;
+
+      // copy coordinates of camera that no happen thread error
+      xCamera2 = this.xCamera;
+      yCamera2 = this.yCamera;
+      zCamera2 = this.zCamera;
+      // sort by length to camera for correct transparency
+      Collections.sort(transparentObjects, comparatorByZ);
     }
 
     for (int i = 0; i < transparentObjects.size(); i++) {
