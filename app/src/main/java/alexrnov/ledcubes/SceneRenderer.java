@@ -182,13 +182,10 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
       Matrix.frustumM(projectionMatrix, 0, -aspect * k,
               aspect * k, -1f * k, 1f * k, 0.1f, 40f);
     }
-
-
+    
     for (int i = 0; i < transparentObjects.size(); i++) {
       transparentObjects.get(i).defineView(viewMatrix, projectionMatrix);
-
     }
-
   }
 
   // called when the frame is redrawn
