@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
   private val yellow = transparent(BasicColor.yellow(), 0.5f)
   private val white = transparent(BasicColor.white(), 0.5f)
   private val magenta = transparent(BasicColor.magenta(), 0.5f)
-  private val gray = transparent(BasicColor.gray(), 0.2f)
+  private val gray = transparent(BasicColor.gray(), 0.24f)
 
   /*
    * Checking the OpenGL version on the device at runtime. The manifest declares
