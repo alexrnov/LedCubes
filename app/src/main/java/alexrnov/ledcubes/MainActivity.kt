@@ -62,21 +62,27 @@ class MainActivity : AppCompatActivity() {
     super.onResume()
 
     timer = Timer(true) // run thread as demon
+
+    val color:FloatArray = when (Random().nextInt(7)) {
+      0 -> cyan
+      1 -> red
+      2 -> blue
+      3 -> green
+      4 -> white
+      5 -> yellow
+      else -> magenta
+    }
+    var k = Random().nextInt(20)
+    if (k == 0) k = 1
     timer?.schedule(object : TimerTask() {
       override fun run() {
         // check initialization of all cubes
         if (surfaceView?.sceneRenderer?.isLoad!!) {
-          var k = Random().nextInt(20)
-          k = if (k == 0) {
-            1
-          } else {
-            9
-          }
 
           /* pass all array that not flickers */
           for (i in 0 until 512) {
             if (i % k == 0) {
-              surfaceView?.sceneRenderer?.setColor(i, cyan) // change color the current cube
+              surfaceView?.sceneRenderer?.setColor(i, color) // change color the current cube
             } else {
               surfaceView?.sceneRenderer?.setColor(i, gray) // turn off leds
             }

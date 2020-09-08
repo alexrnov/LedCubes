@@ -30,12 +30,12 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   /* coordinates of camera */
   private float xCamera = 0.0f;
   private float yCamera = 0.0f;
-  private float zCamera = 2.6f;
+  private float zCamera = 2.2f;
 
   /* coordinates of camera for thread-safe distance calculations */
   private float xCamera2 = 0.0f;
   private float yCamera2 = 0.0f;
-  private float zCamera2 = 2.6f;
+  private float zCamera2 = 2.2f;
 
   private final int NUMBER_CUBES = 512;
   private Cube[] cubes = new Cube[NUMBER_CUBES];
@@ -149,11 +149,11 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
 
     int i = 0; // id of cube
     for (int kz = -4; kz < 4; kz++) {
-      float z = - kz * 0.10f - 0.04f; // subtract the 0.04 value to center the scene
+      float z = - kz * 0.10f - 0.05f; // subtract the 0.05 value to center the scene
       for (int ky = -4; ky < 4; ky++) {
-        float y = ky * 0.10f - 0.04f;
+        float y = ky * 0.10f + 0.05f;
         for (int kx = 4; kx > -4; kx--) { // start position of lowest right angle
-          float x = kx * 0.10f - 0.04f;
+          float x = kx * 0.10f - 0.05f;
           cubes[i] = new Cube(programObject);
           cubes[i].setPosition(x, y, z);
           cubes[i].setColor(defaultColor);
@@ -243,7 +243,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
   public synchronized void defaultView() {
     xCamera = 0f;
     yCamera = 0f;
-    zCamera = 2.6f;
+    zCamera = 2.2f;
     kx = 0f;
     ky = 0f;
 
@@ -266,7 +266,7 @@ public class SceneRenderer implements GLSurfaceView.Renderer {
       ky = ky + yDistance * 0.001f;
     }
 
-    final float radius = 2.6f; // radius of rotation of the camera around the object
+    final float radius = 2.2f; // radius of rotation of the camera around the object
     // define spherical coordinates for camera
     xCamera = (float) (radius * Math.cos(ky) * Math.sin(kx));
     yCamera = (float) (radius * Math.sin(ky));
