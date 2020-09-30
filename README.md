@@ -5,11 +5,11 @@ Due to the fact that many objects (512) are used, alpha-blending is used instead
 <p align="center">Set color:</p>
 
 <p align="center">
-  <img src="https://github.com/alexrnov/Files/blob/master/LedCube1.gif" width="450" title="Level1">
+  <img src="https://github.com/alexrnov/Files/blob/master/LedCube1.gif" width="600" title="Set color">
 </p>
 
 <p align="center">Various modes:</p>
 
 <p align="center">
-  <img src="https://github.com/alexrnov/Files/blob/master/LedCube2.gif" width="450" title="Level1">
+  <img src="https://github.com/alexrnov/Files/blob/master/LedCube2.gif" width="600" title="Various modes">
 </p>
