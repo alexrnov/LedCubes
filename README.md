@@ -1,6 +1,6 @@
 # LedCubes
 OpeGL ES module for MikCube app. Allows you to set the color of each LED in the 8x8x8 cube. 
-Due to the fact that many objects (512) are used, alpha-blending is used instead of lighting. This improves the fps.
+Due to the fact that many objects (512) are used, alpha-blending is used instead of lighting. This improves the FPS.
 
 <p align="center">Set color:</p>
 
